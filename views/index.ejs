@@ -4,19 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentiment Analysis</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+    <!-- Main container -->
     <div class="container">
-        <h1>Sentiment Analysis</h1>
-        <input type="text" id="inputText" placeholder="Enter text to analyze sentiment" />
-        <button onclick="getSentiment()">Predict Sentiment</button>
-        <div id="result" class="result"></div>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>Dashboard</h2>
+            <ul>
+                <li>Home</li>
+                <li>History</li>
+                <li>Settings</li>
+                <li>About</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar toggle button -->
+            <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+            
+            <h1>Sentiment Analysis</h1>
+            <input type="text" id="inputText" placeholder="Enter text to analyze sentiment" />
+            <button onclick="getSentiment()">Predict Sentiment</button>
+            <div id="result"></div>
+        </div>
     </div>
 
-    <script src="/public/js/script.js"></script>
-    <div id="output-container">
-        <p id="result"></p>
-    </div>    
+    <!-- JavaScript -->
+    <script src="/js/script.js"></script>
+
 </body>
 </html>
