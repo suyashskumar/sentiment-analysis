@@ -1,21 +1,30 @@
 import sys
 import pickle
-import pandas as pd
+from datasets import load_dataset
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from transformers import pipeline  # Import Hugging Face pipeline for text generation
 
-# Load dataset
-data_path = './data/dataset.csv'
-dataset = pd.read_csv(data_path)
+# Load dataset from Hugging Face
+ds = load_dataset("Yelp/yelp_review_full")
+
+# Limit the dataset size by selecting only the first 20,000 samples
+dataset = ds['train'].select(range(20000))  # Select first 20,000 rows
+
+# Convert to DataFrame for easier handling
+dataset = dataset.to_pandas()
 
 # Prepare the data
 X = dataset['text']
 y = dataset['label']
 
+# Define the train-test ratio
+train_size = 0.8  # 80% for training
+test_size = 0.2   # 20% for testing
+
 # Split into training and testing sets
-train_size = int(0.8 * len(dataset))
-X_train, X_test = X[:train_size], X[train_size:]
-y_train, y_test = y[:train_size], y[train_size:]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
 # Train the model
 vectorizer = TfidfVectorizer()
@@ -30,6 +39,9 @@ with open('./src/model.pkl', 'wb') as model_file:
 with open('./src/vectorizer.pkl', 'wb') as vec_file:
     pickle.dump(vectorizer, vec_file)
 
+# Initialize Hugging Face's text generation pipeline (you can change the model if needed)
+generator = pipeline("text-generation", model="gpt2")
+
 # Function to predict sentiment
 def predict_sentiment(text):
     with open('./src/model.pkl', 'rb') as model_file:
@@ -41,7 +53,37 @@ def predict_sentiment(text):
     sentiment = model.predict(text_tfidf)[0]
     return sentiment
 
+# Function to map sentiment to stars
+def sentiment_to_stars(sentiment):
+    # Map sentiment values (0-4) to 1-5 star scale
+    sentiment_map = {
+        0: "Extremely Negative (1 Star)",
+        1: "Slightly Negative (2 Star)",
+        2: "Neutral (3 Star)",
+        3: "Slightly Positive (4 Star)",
+        4: "Extremely Positive (5 Star)"
+    }
+    return sentiment_map.get(sentiment, "Unknown Sentiment")
+
+# Function to generate feedback from a generative model
+def generate_feedback(text, sentiment):
+    sentiment_label = sentiment_to_stars(sentiment)
+
+    # Generate feedback based on sentiment prediction
+    feedback_prompt = f"Based on the sentiment analysis, the sentiment of this comment is {sentiment_label}. The comment is: '{text}'. Provide feedback on why the sentiment was predicted and suggestions for improvement."
+    feedback = generator(feedback_prompt, max_new_tokens=200)[0]['generated_text']
+    
+    return feedback
+
 if __name__ == '__main__':
+    # Example text to analyze
     text = sys.argv[1]
+    
+    # Predict sentiment
     sentiment = predict_sentiment(text)
-    print(sentiment)
+    sentiment_label = sentiment_to_stars(sentiment)
+    print(sentiment_label)
+    
+    # Generate feedback
+    feedback = generate_feedback(text, sentiment)
+    print("Generated Feedback:", feedback)

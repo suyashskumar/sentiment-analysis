@@ -22,9 +22,10 @@ app.post('/predict', (req, res) => {
         // Spawn a Python process to run the sentiment analysis model
         const python = spawn('python', ['src/sentiment_model.py', text]);
 
+        let sentiment = '';  // Store the sentiment prediction
+
         python.stdout.on('data', (data) => {
-            const sentiment = data.toString().trim();  // Extract sentiment prediction
-            res.json({ sentiment });  // Send the prediction back to the frontend
+            sentiment += data.toString().trim();  // Append the data received
         });
 
         python.stderr.on('data', (data) => {
@@ -33,8 +34,11 @@ app.post('/predict', (req, res) => {
 
         python.on('close', (code) => {
             if (code !== 0) {
-                res.status(500).json({ error: 'Python process failed' });
+                return res.status(500).json({ error: 'Python process failed' });
             }
+
+            // Send the response after the Python process finishes
+            res.json({ sentiment });
         });
 
     } catch (error) {
