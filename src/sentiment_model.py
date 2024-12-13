@@ -44,14 +44,18 @@ generator = pipeline("text-generation", model="gpt2")
 
 # Function to predict sentiment
 def predict_sentiment(text):
-    with open('./src/model.pkl', 'rb') as model_file:
-        model = pickle.load(model_file)
-    with open('./src/vectorizer.pkl', 'rb') as vec_file:
-        vectorizer = pickle.load(vec_file)
+    try:
+        with open('./src/model.pkl', 'rb') as model_file:
+            model = pickle.load(model_file)
+        with open('./src/vectorizer.pkl', 'rb') as vec_file:
+            vectorizer = pickle.load(vec_file)
 
-    text_tfidf = vectorizer.transform([text])
-    sentiment = model.predict(text_tfidf)[0]
-    return sentiment
+        text_tfidf = vectorizer.transform([text])
+        sentiment = model.predict(text_tfidf)[0]
+        return sentiment
+    except Exception as e:
+        print(f"Error in predict_sentiment: {e}", file=sys.stderr)
+        return None
 
 # Function to map sentiment to stars
 def sentiment_to_stars(sentiment):
@@ -67,13 +71,14 @@ def sentiment_to_stars(sentiment):
 
 # Function to generate feedback from a generative model
 def generate_feedback(text, sentiment):
-    sentiment_label = sentiment_to_stars(sentiment)
-
-    # Generate feedback based on sentiment prediction
-    feedback_prompt = f"Based on the sentiment analysis, the sentiment of this comment is {sentiment_label}. The comment is: '{text}'. Provide feedback on why the sentiment was predicted and suggestions for improvement."
-    feedback = generator(feedback_prompt, max_new_tokens=200)[0]['generated_text']
-    
-    return feedback
+    try:
+        sentiment_label = sentiment_to_stars(sentiment)
+        feedback_prompt = f"Provide why {text} is considered {sentiment_label}."
+        feedback = generator(feedback_prompt, max_new_tokens=200)[0]['generated_text']
+        return feedback
+    except Exception as e:
+        print(f"Error in generate_feedback: {e}", file=sys.stderr)
+        return "Unable to generate feedback."
 
 if __name__ == '__main__':
     # Example text to analyze

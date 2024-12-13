@@ -73,6 +73,51 @@ body {
     padding: 20px;
     position: relative;
 }
+/* Sentiment/Star Styles */
+/* Default loading state */
+.loading {
+    color: #6c757d; /* Gray */
+    font-style: italic;
+}
+
+/* Error state */
+.error {
+    color: #dc3545; /* Red */
+    font-weight: bold;
+}
+
+/* Sentiment-specific styles */
+.sentiment-0 {
+    color: #ff0000; /* Bright red for extremely negative */
+}
+
+.sentiment-1 {
+    color: #ff6347; /* Orange-red for slightly negative */
+}
+
+.sentiment-2 {
+    color: #ffc107; /* Yellow for neutral */
+}
+
+.sentiment-3 {
+    color: #28a745; /* Green for slightly positive */
+}
+
+.sentiment-4 {
+    color: #007bff; /* Blue for extremely positive */
+}
+
+
+/* Result Box Styling */
+#result {
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
 
 /* Responsive design */
 @media (max-width: 768px) {
