@@ -73,7 +73,7 @@ body {
     padding: 20px;
     position: relative;
 }
-/* Sentiment/Star Styles */
+
 /* Default loading state */
 .loading {
     color: #6c757d; /* Gray */
@@ -86,28 +86,6 @@ body {
     font-weight: bold;
 }
 
-/* Sentiment-specific styles */
-.sentiment-0 {
-    color: #ff0000; /* Bright red for extremely negative */
-}
-
-.sentiment-1 {
-    color: #ff6347; /* Orange-red for slightly negative */
-}
-
-.sentiment-2 {
-    color: #ffc107; /* Yellow for neutral */
-}
-
-.sentiment-3 {
-    color: #28a745; /* Green for slightly positive */
-}
-
-.sentiment-4 {
-    color: #007bff; /* Blue for extremely positive */
-}
-
-
 /* Result Box Styling */
 #result {
     padding: 15px;
@@ -117,6 +95,36 @@ body {
     font-weight: bold;
     text-align: center;
     transition: background-color 0.3s ease;
+}
+
+/* Sentiment-based styling */
+.extremely-positive {
+    color: #007bff; /* Blue for Extremely Positive (5 Star) */
+}
+
+.slightly-positive {
+    color: #28a745; /* Green for Slightly Positive (4 Star) */
+}
+
+.neutral {
+    color: #ffc107; /* Yellow for Neutral (3 Star) */
+}
+
+.slightly-negative {
+    color: #ff6347; /* Orange for Slightly Negative (2 Star) */
+}
+
+.extremely-negative {
+    color: #ff0000; /* Dark Red for Extremely Negative (1 Star) */
+}
+
+.other {
+    color: #a020f0; /* Violet for Other */
+}
+
+/* Error state */
+.error {
+    color: #dc3545; /* Red for error message */
 }
 
 /* Responsive design */
