@@ -1,6 +1,3 @@
-Here's the `README.md` file for your project:
-
-```markdown
 # Sentiment Analysis and Feedback Generation System
 
 This project is a sentiment analysis application that predicts sentiment from text input and provides feedback using a generative AI model. It includes a web-based frontend for user interaction and a backend powered by Python and Node.js.
@@ -119,4 +116,3 @@ This project is licensed under the MIT License. See `LICENSE` for details.
 
 - Hugging Face for the dataset.
 - Google Generative AI for feedback generation.
-```
