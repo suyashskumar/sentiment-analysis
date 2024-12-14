@@ -110,5 +110,5 @@ sentiment-analysis/
 
 ## Acknowledgements
 
-- Hugging Face for the dataset.
-- Google Generative AI for feedback generation.
+- **Hugging Face** for the dataset.
+- **Google Generative AI** for feedback generation.
