@@ -1,4 +1,4 @@
-# Sentiment Analysis and Feedback Generation System
+# Sentiment Analysis for Brand Monitoring
 
 This project is a sentiment analysis application that predicts sentiment from text input and provides feedback using a generative AI model. It includes a web-based frontend for user interaction and a backend powered by Python and Node.js.
 
@@ -63,8 +63,12 @@ This project is a sentiment analysis application that predicts sentiment from te
    ```bash
    npm start
    ```
+   or
+   ```bash
+   node app.js
+   ```
 
-6. Access the application at `http://localhost:3000`.
+7. Access the application at `http://localhost:3000`.
 
 ## File Structure
 
@@ -103,16 +107,3 @@ sentiment-analysis/
 ### Node.js Server
 - **`/`**: Serves the index page.
 - **`/predict`**: Handles POST requests for sentiment analysis and feedback generation.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository, make changes, and submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See `LICENSE` for details.
-
-## Acknowledgments
-
-- Hugging Face for the dataset.
-- Google Generative AI for feedback generation.
