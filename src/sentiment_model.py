@@ -1,10 +1,14 @@
 import sys
+import os
 import pickle
 from datasets import load_dataset
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from transformers import pipeline  # Import Hugging Face pipeline for text generation
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Load dataset from Hugging Face
 ds = load_dataset("Yelp/yelp_review_full")
@@ -39,8 +43,24 @@ with open('./src/model.pkl', 'wb') as model_file:
 with open('./src/vectorizer.pkl', 'wb') as vec_file:
     pickle.dump(vectorizer, vec_file)
 
-# Initialize Hugging Face's text generation pipeline (you can change the model if needed)
-generator = pipeline("text-generation", model="gpt2", pad_token_id=50256)
+api_key = os.getenv('API_KEY')
+genai.configure(api_key=api_key)
+
+# Create the model
+generation_config = {
+  "temperature": 1,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 350,
+  "response_mime_type": "text/plain",
+}
+
+model = genai.GenerativeModel(
+  model_name="gemini-1.5-flash",
+  generation_config=generation_config,
+)
+
+chat_session = model.start_chat()
 
 # Function to predict sentiment
 def predict_sentiment(text):
@@ -73,9 +93,9 @@ def sentiment_to_stars(sentiment):
 def generate_feedback(text, sentiment):
     try:
         sentiment_label = sentiment_to_stars(sentiment)
-        feedback_prompt = f"You're an Artificial Intelligence model. Analyze why {text} is considered {sentiment_label} by the customer who provided the input in around 150-200 words."
-        feedback = generator(feedback_prompt, max_new_tokens=350)[0]['generated_text']
-        feedback = feedback[len(feedback_prompt):].strip()
+        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback for the same. Keep it limited to 150-200 words."
+        response = model.generate_content(feedback_prompt)
+        feedback = response.text
         return feedback
     except Exception as e:
         print(f"Error in generate_feedback: {e}", file=sys.stderr)

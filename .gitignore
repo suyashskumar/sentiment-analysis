@@ -3,3 +3,4 @@ src/model.pkl
 src/vectorizer.pkl
 .venv/
 venv/
+.env
