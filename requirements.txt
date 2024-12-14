@@ -1,3 +1,5 @@
-pandas
-scikit-learn
-datasets
+datasets==2.15.1
+scikit-learn==1.3.0
+google-generativeai==0.2.1
+python-dotenv==1.0.0
+pandas==2.1.1
