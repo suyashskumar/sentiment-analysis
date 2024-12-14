@@ -73,8 +73,9 @@ def sentiment_to_stars(sentiment):
 def generate_feedback(text, sentiment):
     try:
         sentiment_label = sentiment_to_stars(sentiment)
-        feedback_prompt = f"You're a third-party analyst. Analyze why {text} is considered {sentiment_label} by the customer who provided the input."
+        feedback_prompt = f"You're an Artificial Intelligence model. Analyze why {text} is considered {sentiment_label} by the customer who provided the input in around 150-200 words."
         feedback = generator(feedback_prompt, max_new_tokens=350)[0]['generated_text']
+        feedback = feedback[len(feedback_prompt):].strip()
         return feedback
     except Exception as e:
         print(f"Error in generate_feedback: {e}", file=sys.stderr)

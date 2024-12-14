@@ -1,3 +1,9 @@
+function resizeTextarea() {
+    var textarea = document.getElementById('inputText');
+    textarea.style.height = 'auto';  // Reset height to auto to recalculate it
+    textarea.style.height = (textarea.scrollHeight) + 'px';  // Set height based on scrollHeight
+}
+
 // Function to handle the form submission and get the prediction
 async function getSentiment() {
     const text = document.getElementById('inputText').value;
@@ -28,7 +34,7 @@ async function getSentiment() {
         console.log('Feedback:', feedback);
 
         // Display the sentiment result
-        resultElement.innerText = `Predicted Sentiment: ${sentiment}\n\nFeedback: ${feedback}`;
+        resultElement.innerText = `Predicted Sentiment: ${sentiment}\n\nAnalysis & Feedback:\n\n${feedback}`;
         
         // Dynamically add a class based on the sentiment
         resultElement.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');

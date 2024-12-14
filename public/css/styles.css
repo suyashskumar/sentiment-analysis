@@ -6,6 +6,20 @@ body {
     padding: 0;
 }
 
+textarea {
+    width: 100%;
+    min-height: 50px; /* Minimum height */
+    max-width: 100%;
+    resize: none; /* Disable manual resizing */
+    overflow: hidden; /* Hide scrollbar */
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 20px; /* Space between textarea and button */
+}
+
 /* General styling adjustments for container */
 .container {
     display: flex;
@@ -89,6 +103,7 @@ body {
     font-weight: bold;
     text-align: center;
     transition: background-color 0.3s ease;
+    border: 2px solid #ccc;
 }
 
 /* Default loading state */
@@ -100,32 +115,38 @@ body {
 /* Sentiment-based styling */
 .extremely-positive {
     font-style: normal !important;
-    color: #044416; /* Dark Green for Extremely Positive (5 Star) */
+    color: #00FF00; /* Dark Green for Extremely Positive (5 Star) */
+    background-color: black; 
 }
 
 .slightly-positive {
     font-style: normal !important;
-    color: #3e9051; /* Green for Slightly Positive (4 Star) */
+    color: #9ACD32; /* Green for Slightly Positive (4 Star) */
+    background-color: black; 
 }
 
 .neutral {
     font-style: normal !important;
-    color: #ad850f; /* Yellow for Neutral (3 Star) */
+    color: #FFFF00; /* Yellow for Neutral (3 Star) */
+    background-color: black; 
 }
 
 .slightly-negative {
     font-style: normal !important;
-    color: #ab2a14; /* Red for Slightly Negative (2 Star) */
+    color: #FFA500; /* Red for Slightly Negative (2 Star) */
+    background-color: black; 
 }
 
 .extremely-negative {
     font-style: normal !important;
-    color: #650808; /* Dark Red for Extremely Negative (1 Star) */
+    color: #FF0000; /* Dark Red for Extremely Negative (1 Star) */
+    background-color: black; 
 }
 
 .other {
     font-style: normal !important;
-    color: #a020f0; /* Violet for Other */
+    color: #20d4f0; /* Violet for Other */
+    background-color: black; 
 }
 
 /* Error state */

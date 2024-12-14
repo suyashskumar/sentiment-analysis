@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentiment Analysis</title>
+    <title>Sentiment Analysis Model</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -25,8 +25,8 @@
             <!-- Sidebar toggle button -->
             <button id="menuToggle" onclick="toggleSidebar()">☰</button>
             
-            <h1>Sentiment Analysis</h1>
-            <input type="text" id="inputText" placeholder="Enter text to analyze sentiment" />
+            <h1>Sentiment Analysis for Brand Monitoring</h1>
+            <textarea id="inputText" placeholder="Enter text to analyze sentiment" oninput="resizeTextarea()"></textarea>
             <button onclick="getSentiment()">Predict Sentiment</button>
             <div id="result">Your sentiment result will appear here.</div>
         </div>
