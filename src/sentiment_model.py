@@ -40,7 +40,7 @@ with open('./src/vectorizer.pkl', 'wb') as vec_file:
     pickle.dump(vectorizer, vec_file)
 
 # Initialize Hugging Face's text generation pipeline (you can change the model if needed)
-generator = pipeline("text-generation", model="gpt2")
+generator = pipeline("text-generation", model="gpt2", pad_token_id=50256)
 
 # Function to predict sentiment
 def predict_sentiment(text):
