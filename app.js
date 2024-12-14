@@ -25,10 +25,15 @@ app.post('/predict', (req, res) => {
         let feedback = '';  // Store the generated feedback
         python.stdout.on('data', (data) => {
             const output = data.toString().trim();
+            console.log('Python output:', output);
             // We expect the first line to be sentiment, second to be feedback
-            const [sentimentLine, feedbackLine] = output.split('\n');
-            sentiment = sentimentLine;
-            feedback = feedbackLine || '';
+            const lines = output.split('\n');
+
+            // The first line is sentiment
+            sentiment = lines[0];
+        
+            // The rest of the lines are feedback (if any)
+            feedback = lines.slice(1).join('\n');
         });
 
         python.stderr.on('data', (data) => {
@@ -41,7 +46,7 @@ app.post('/predict', (req, res) => {
             }
 
             console.log('Sentiment Value:', sentiment);
-
+            console.log('Feedback:', feedback);
             // Send both sentiment and feedback in the response
             res.json({ sentiment, feedback });
         });

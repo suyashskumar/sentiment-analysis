@@ -21,11 +21,11 @@ body {
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease-in-out;
-    transform: translateX(-100%); /* Hidden by default */
+    transform: translateX(0); 
 }
 
 .sidebar.active {
-    transform: translateX(0); /* Slide in when active */
+    transform: translateX(-100%); /* Slide out when inactive */
 }
 
 .sidebar h2 {
@@ -74,12 +74,6 @@ body {
     position: relative;
 }
 
-/* Default loading state */
-.loading {
-    color: #6c757d; /* Gray */
-    font-style: italic;
-}
-
 /* Error state */
 .error {
     color: #dc3545; /* Red */
@@ -97,33 +91,46 @@ body {
     transition: background-color 0.3s ease;
 }
 
+/* Default loading state */
+.loading {
+    color: #6c757d; /* Gray */
+    font-style: italic;
+}
+
 /* Sentiment-based styling */
 .extremely-positive {
-    color: #007bff; /* Blue for Extremely Positive (5 Star) */
+    font-style: normal !important;
+    color: #044416; /* Dark Green for Extremely Positive (5 Star) */
 }
 
 .slightly-positive {
-    color: #28a745; /* Green for Slightly Positive (4 Star) */
+    font-style: normal !important;
+    color: #3e9051; /* Green for Slightly Positive (4 Star) */
 }
 
 .neutral {
-    color: #ffc107; /* Yellow for Neutral (3 Star) */
+    font-style: normal !important;
+    color: #ad850f; /* Yellow for Neutral (3 Star) */
 }
 
 .slightly-negative {
-    color: #ff6347; /* Orange for Slightly Negative (2 Star) */
+    font-style: normal !important;
+    color: #ab2a14; /* Red for Slightly Negative (2 Star) */
 }
 
 .extremely-negative {
-    color: #ff0000; /* Dark Red for Extremely Negative (1 Star) */
+    font-style: normal !important;
+    color: #650808; /* Dark Red for Extremely Negative (1 Star) */
 }
 
 .other {
+    font-style: normal !important;
     color: #a020f0; /* Violet for Other */
 }
 
 /* Error state */
 .error {
+    font-style: normal !important;
     color: #dc3545; /* Red for error message */
 }
 

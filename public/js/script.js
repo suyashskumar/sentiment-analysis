@@ -28,7 +28,7 @@ async function getSentiment() {
         console.log('Feedback:', feedback);
 
         // Display the sentiment result
-        resultElement.innerText = `Predicted Sentiment: ${sentiment}\nFeedback: ${feedback}`;
+        resultElement.innerText = `Predicted Sentiment: ${sentiment}\n\nFeedback: ${feedback}`;
         
         // Dynamically add a class based on the sentiment
         resultElement.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
