@@ -107,3 +107,8 @@ sentiment-analysis/
 ### Node.js Server
 - **`/`**: Serves the index page.
 - **`/predict`**: Handles POST requests for sentiment analysis and feedback generation.
+
+## Acknowledgements
+
+- Hugging Face for the dataset.
+- Google Generative AI for feedback generation.
