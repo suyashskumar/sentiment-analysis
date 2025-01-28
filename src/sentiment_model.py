@@ -1,50 +1,21 @@
+import os
 import sys
 import json
-import os
 import pickle
-from datasets import load_dataset
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 import google.generativeai as genai
+from sklearn.feature_extraction.text import TfidfVectorizer
 from dotenv import load_dotenv
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request  # <-- Add this import
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
+# Load environment variables from .env
 load_dotenv()
 
-# Load dataset from Hugging Face
-ds = load_dataset("Yelp/yelp_review_full")
-
-# Limit the dataset size by selecting only the first 20,000 samples
-dataset = ds['train'].select(range(20000))  # Select first 20,000 rows
-
-# Convert to DataFrame for easier handling
-dataset = dataset.to_pandas()
-
-# Prepare the data
-X = dataset['text']
-y = dataset['label']
-
-# Define the train-test ratio
-train_size = 0.8  # 80% for training
-test_size = 0.2   # 20% for testing
-
-# Split into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
-
-# Train the model
-vectorizer = TfidfVectorizer()
-X_train_tfidf = vectorizer.fit_transform(X_train)
-
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train_tfidf, y_train)
-
-# Save the model and vectorizer
-with open('./src/model.pkl', 'wb') as model_file:
-    pickle.dump(model, model_file)
-with open('./src/vectorizer.pkl', 'wb') as vec_file:
-    pickle.dump(vectorizer, vec_file)
-
 api_key = os.getenv('API_KEY')
+model_file_id = os.getenv('MODEL_FILE_ID')  # <-- Load from .env
+vectorizer_file_id = os.getenv('VECTORIZER_FILE_ID')  # <-- Load from .env
 genai.configure(api_key=api_key)
 
 # Create the model
@@ -63,14 +34,45 @@ model = genai.GenerativeModel(
 
 chat_session = model.start_chat()
 
+# Authenticate with Google Drive API
+def authenticate_drive():
+    creds = None
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', ['https://www.googleapis.com/auth/drive.readonly'])
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())  # <-- Use the Request class here
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', ['https://www.googleapis.com/auth/drive.readonly'])
+            creds = flow.run_local_server(port=0)
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+    return build('drive', 'v3', credentials=creds)
+
+def download_file(file_id, destination):
+    drive_service = authenticate_drive()
+    request = drive_service.files().get_media(fileId=file_id)
+    with open(destination, 'wb') as file:
+        request.execute()
+
+# Function to load model and vectorizer from Google Drive
+def load_model_and_vectorizer():
+    # Download model and vectorizer from Google Drive using file IDs from .env
+    download_file(model_file_id, 'sentiment_model.pkl')
+    download_file(vectorizer_file_id, 'vectorizer.pkl')
+
+    # Load the model and vectorizer from local storage
+    with open('sentiment_model.pkl', 'rb') as model_file:
+        model = pickle.load(model_file)
+    with open('vectorizer.pkl', 'rb') as vec_file:
+        vectorizer = pickle.load(vec_file)
+
+    return model, vectorizer
+
 # Function to predict sentiment
 def predict_sentiment(text):
     try:
-        with open('./src/model.pkl', 'rb') as model_file:
-            model = pickle.load(model_file)
-        with open('./src/vectorizer.pkl', 'rb') as vec_file:
-            vectorizer = pickle.load(vec_file)
-
+        model, vectorizer = load_model_and_vectorizer()
         text_tfidf = vectorizer.transform([text])
         sentiment = model.predict(text_tfidf)[0]
         return sentiment
@@ -80,7 +82,6 @@ def predict_sentiment(text):
 
 # Function to map sentiment to stars
 def sentiment_to_stars(sentiment):
-    # Map sentiment values (0-4) to 1-5 star scale
     sentiment_map = {
         0: "Extremely Negative (1 Star)",
         1: "Slightly Negative (2 Star)",
