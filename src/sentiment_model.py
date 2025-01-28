@@ -75,6 +75,7 @@ def predict_sentiment(text):
         model, vectorizer = load_model_and_vectorizer()
         text_tfidf = vectorizer.transform([text])
         sentiment = model.predict(text_tfidf)[0]
+        print(f"Raw sentiment prediction: {sentiment}")
         return sentiment
     except Exception as e:
         print(f"Error in predict_sentiment: {e}", file=sys.stderr)
