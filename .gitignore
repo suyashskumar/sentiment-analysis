@@ -1,6 +1,8 @@
 node_modules/
-src/model.pkl
-src/vectorizer.pkl
+sentiment_model.pkl
+vectorizer.pkl
 .venv/
 venv/
 .env
+credentials.json
+token.json
