@@ -1,4 +1,5 @@
 import sys
+import json
 import os
 import pickle
 from datasets import load_dataset
@@ -102,14 +103,20 @@ def generate_feedback(text, sentiment):
         return "Unable to generate feedback."
 
 if __name__ == '__main__':
-    # Example text to analyze
     text = sys.argv[1]
     
     # Predict sentiment
     sentiment = predict_sentiment(text)
     sentiment_label = sentiment_to_stars(sentiment)
-    print(sentiment_label)
     
     # Generate feedback
     feedback = generate_feedback(text, sentiment)
-    print(feedback)
+    
+    # Return both sentiment_label and feedback as JSON
+    result = {
+        'sentiment_label': sentiment_label,
+        'feedback': feedback
+    }
+    
+    # Print the JSON result
+    print(json.dumps(result))

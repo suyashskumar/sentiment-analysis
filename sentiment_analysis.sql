@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS sentiment_inputs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     input_text TEXT NOT NULL, -- Input text from the user
     sentiment_label VARCHAR(255) NOT NULL, -- Sentiment label generated
-    feedback TEXT NOT NULL, -- Feedback generated
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of entry
 );
 
