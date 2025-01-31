@@ -1,66 +1,72 @@
+// Auto-resize textarea based on input
 function resizeTextarea() {
-    var textarea = document.getElementById('inputText');
-    textarea.style.height = 'auto';  // Reset height to auto to recalculate it
-    textarea.style.height = (textarea.scrollHeight) + 'px';  // Set height based on scrollHeight
+    const textarea = document.getElementById('inputText');
+    textarea.style.height = 'auto';  // Reset height to recalculate it
+    textarea.style.height = `${textarea.scrollHeight}px`;  // Adjust height dynamically
 }
 
-// Function to handle the form submission and get the prediction
+// Function to handle sentiment analysis request
 async function getSentiment() {
-    const text = document.getElementById('inputText').value;
+    const text = document.getElementById('inputText').value.trim();
+    const resultElement = document.getElementById('result');
 
-    // Check if the input is not empty
-    if (text.trim() === '') {
+    // Check for empty input
+    if (!text) {
         alert('Please enter some text.');
         return;
     }
 
-    // Display loading message and reset previous state
-    const resultElement = document.getElementById('result');
+    // Show loading state
     resultElement.innerText = 'Analyzing sentiment...';
-    resultElement.className = 'loading'; // Add a class for styling the loading state
+    resultElement.className = 'loading'; 
 
     try {
         const response = await fetch('/predict', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }), // Send input text to the server
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
         });
-        const result = await response.json();
-        const { sentiment, feedback } = result;
 
-        console.log('Sentiment:', sentiment); // Log the sentiment value (0-4)
+        if (!response.ok) throw new Error('Server error, please try again.');
+
+        const { sentiment, feedback } = await response.json();
+        console.log('Sentiment:', sentiment);
         console.log('Feedback:', feedback);
 
-        // Display the sentiment result
-        resultElement.innerText = `Predicted Sentiment: ${sentiment}\n\nAnalysis & Feedback:\n\n${feedback}`;
-        
-        // Dynamically add a class based on the sentiment
-        resultElement.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
-        
-        if (sentiment.includes('Extremely Positive')) {
-            resultElement.classList.add('extremely-positive');
-        } else if (sentiment.includes('Slightly Positive')) {
-            resultElement.classList.add('slightly-positive');
-        } else if (sentiment.includes('Neutral')) {
-            resultElement.classList.add('neutral');
-        } else if (sentiment.includes('Slightly Negative')) {
-            resultElement.classList.add('slightly-negative');
-        } else if (sentiment.includes('Extremely Negative')) {
-            resultElement.classList.add('extremely-negative');
-        } else {
-            resultElement.classList.add('other');
-        }
+        // Display the result
+        resultElement.innerHTML = `<strong>Predicted Sentiment:</strong> ${sentiment} <br><br>
+                                   <strong>Analysis & Feedback:</strong> <br>${feedback}`;
+
+        // Update sentiment-based styling
+        updateSentimentClass(resultElement, sentiment);
+
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
-        resultElement.classList.add('error');
+        resultElement.className = 'error';
     }
 }
 
-// Function to toggle the sidebar visibility
+// Function to dynamically update sentiment styling
+function updateSentimentClass(element, sentiment) {
+    element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
+
+    if (sentiment.includes('Extremely Positive')) {
+        element.classList.add('extremely-positive');
+    } else if (sentiment.includes('Slightly Positive')) {
+        element.classList.add('slightly-positive');
+    } else if (sentiment.includes('Neutral')) {
+        element.classList.add('neutral');
+    } else if (sentiment.includes('Slightly Negative')) {
+        element.classList.add('slightly-negative');
+    } else if (sentiment.includes('Extremely Negative')) {
+        element.classList.add('extremely-negative');
+    } else {
+        element.classList.add('other');
+    }
+}
+
+// Function to toggle sidebar visibility
 function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('active');
+    document.getElementById('sidebar').classList.toggle('active');
 }

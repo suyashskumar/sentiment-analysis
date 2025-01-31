@@ -31,59 +31,76 @@ app.get('/', (req, res) => {
 });
 
 app.post('/predict', (req, res) => {
-    const { text } = req.body;
+  const { text } = req.body;
   
-    try {
-      const python = spawn('python', ['src/sentiment_model.py', text]);
-  
-      let sentiment = '';
-      let feedback = '';
-  
-      python.stdout.on('data', (data) => {
-        const output = data.toString().trim();
-        console.log('Python output:', output);
-  
-        try {
-          // Assuming the output is now a JSON string with both sentiment and feedback
-          const result = JSON.parse(output);
-          sentiment = result.sentiment_label;
-          feedback = result.feedback;
-        } catch (error) {
-          console.error('Error parsing Python output:', error);
+  if (!text || text.trim() === '') {
+    return res.status(400).json({ error: 'Text input cannot be empty' });
+  }
+
+  try {
+    const python = spawn('python', ['src/sentiment_model.py', text]);
+
+    let sentiment = 'Unknown Sentiment';
+    let feedback = 'No feedback available';
+
+    python.stdout.on('data', (data) => {
+      const output = data.toString().trim();
+      console.log('Python output:', output);
+
+      try {
+        const result = JSON.parse(output);
+        sentiment = result.sentiment_label || 'Unknown Sentiment';
+        feedback = result.feedback || 'No feedback available';
+      } catch (error) {
+        console.error('Error parsing Python output:', error);
+      }
+    });
+
+    python.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    python.on('close', (code) => {
+      if (code !== 0) {
+        return res.status(500).json({ error: 'Python process failed' });
+      }
+
+      console.log('Sentiment:', sentiment);
+      console.log('Feedback:', feedback);
+
+      // Insert into sentiment_inputs table
+      const query = 'INSERT INTO sentiment_inputs (input_text, sentiment_label, created_at) VALUES (?, ?, NOW())';
+      connection.query(query, [text, sentiment], (err, result) => {
+        if (err) {
+          console.error('Error inserting data into the database:', err);
+          return res.status(500).json({ error: 'Database insertion failed' });
         }
-      });
-  
-      python.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-      });
-  
-      python.on('close', (code) => {
-        if (code !== 0) {
-          return res.status(500).json({ error: 'Python process failed' });
-        }
-  
-        console.log('Sentiment:', sentiment);
-        console.log('Feedback:', feedback);
-  
-        // Insert only input_text and sentiment_label into the database
-        const query = 'INSERT INTO sentiment_inputs (input_text, sentiment_label) VALUES (?, ?)';
-        connection.query(query, [text, sentiment], (err, result) => {
-          if (err) {
-            console.error('Error inserting data into the database:', err);
-            return res.status(500).json({ error: 'Database insertion failed' });
-          }
-          console.log('Data inserted successfully:', result);
-        });
-  
-        // Return the sentiment and feedback as JSON response
+        console.log('Data inserted successfully:', result);
+        
+        // Send response after successful database insertion
         res.json({ sentiment, feedback });
       });
-  
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Something went wrong' });
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+// **History Route**
+// **History Route**
+app.get('/history', (req, res) => {
+  const query = `SELECT input_text, sentiment_label, created_at FROM sentiment_inputs ORDER BY created_at DESC`;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching history:", err);
+      return res.status(500).send("Database query failed");
     }
-  }); 
+    res.render('history', { history: results });
+  });
+});
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');

@@ -1,12 +1,12 @@
 import os
 import sys
 import json
-import pickle
+import joblib  # Use joblib instead of pickle
 import google.generativeai as genai
 from sklearn.feature_extraction.text import TfidfVectorizer
 from dotenv import load_dotenv
 from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request  # <-- Add this import
+from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
@@ -14,11 +14,11 @@ from googleapiclient.discovery import build
 load_dotenv()
 
 api_key = os.getenv('API_KEY')
-model_file_id = os.getenv('MODEL_FILE_ID')  # <-- Load from .env
-vectorizer_file_id = os.getenv('VECTORIZER_FILE_ID')  # <-- Load from .env
+model_file_id = os.getenv('MODEL_FILE_ID')  # File ID from Google Drive
+vectorizer_file_id = os.getenv('VECTORIZER_FILE_ID')  # File ID from Google Drive
 genai.configure(api_key=api_key)
 
-# Create the model
+# Configure generative AI model
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
@@ -41,7 +41,7 @@ def authenticate_drive():
         creds = Credentials.from_authorized_user_file('token.json', ['https://www.googleapis.com/auth/drive.readonly'])
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())  # <-- Use the Request class here
+            creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', ['https://www.googleapis.com/auth/drive.readonly'])
             creds = flow.run_local_server(port=0)
@@ -49,23 +49,28 @@ def authenticate_drive():
             token.write(creds.to_json())
     return build('drive', 'v3', credentials=creds)
 
+# Download file from Google Drive
 def download_file(file_id, destination):
-    drive_service = authenticate_drive()
-    request = drive_service.files().get_media(fileId=file_id)
-    with open(destination, 'wb') as file:
-        request.execute()
+    try:
+        drive_service = authenticate_drive()
+        request = drive_service.files().get_media(fileId=file_id)
+        with open(destination, 'wb') as file:
+            request.execute()
+    except Exception as e:
+        print(f"Error downloading file: {e}", file=sys.stderr)
 
-# Function to load model and vectorizer from Google Drive
+# Function to load model and vectorizer
 def load_model_and_vectorizer():
-    # Download model and vectorizer from Google Drive using file IDs from .env
-    download_file(model_file_id, 'sentiment_model.pkl')
-    download_file(vectorizer_file_id, 'vectorizer.pkl')
+    model_path = "sentiment_model.sav"
+    vectorizer_path = "vectorizer.sav"
 
-    # Load the model and vectorizer from local storage
-    with open('sentiment_model.pkl', 'rb') as model_file:
-        model = pickle.load(model_file)
-    with open('vectorizer.pkl', 'rb') as vec_file:
-        vectorizer = pickle.load(vec_file)
+    # Download model and vectorizer from Google Drive
+    download_file(model_file_id, model_path)
+    download_file(vectorizer_file_id, vectorizer_path)
+
+    # Load using joblib
+    model = joblib.load(model_path)
+    vectorizer = joblib.load(vectorizer_path)
 
     return model, vectorizer
 
@@ -75,13 +80,12 @@ def predict_sentiment(text):
         model, vectorizer = load_model_and_vectorizer()
         text_tfidf = vectorizer.transform([text])
         sentiment = model.predict(text_tfidf)[0]
-        print(f"Raw sentiment prediction: {sentiment}")
         return sentiment
     except Exception as e:
         print(f"Error in predict_sentiment: {e}", file=sys.stderr)
         return None
 
-# Function to map sentiment to stars
+# Function to map sentiment score to star rating
 def sentiment_to_stars(sentiment):
     sentiment_map = {
         0: "Extremely Negative (1 Star)",
@@ -92,11 +96,11 @@ def sentiment_to_stars(sentiment):
     }
     return sentiment_map.get(sentiment, "Unknown Sentiment")
 
-# Function to generate feedback from a generative model
+# Function to generate feedback using AI
 def generate_feedback(text, sentiment):
     try:
         sentiment_label = sentiment_to_stars(sentiment)
-        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback for the same. Keep it limited to 150-200 words."
+        feedback_prompt = f"Analyze why {text} is considered {sentiment_label}. Provide feedback within 150-200 words."
         response = model.generate_content(feedback_prompt)
         feedback = response.text
         return feedback
@@ -105,7 +109,7 @@ def generate_feedback(text, sentiment):
         return "Unable to generate feedback."
 
 if __name__ == '__main__':
-    text = sys.argv[1]
+    text = sys.argv[1]  # Get input from command line
     
     # Predict sentiment
     sentiment = predict_sentiment(text)
@@ -114,11 +118,10 @@ if __name__ == '__main__':
     # Generate feedback
     feedback = generate_feedback(text, sentiment)
     
-    # Return both sentiment_label and feedback as JSON
+    # Return sentiment label and feedback as JSON
     result = {
         'sentiment_label': sentiment_label,
         'feedback': feedback
     }
     
-    # Print the JSON result
     print(json.dumps(result))

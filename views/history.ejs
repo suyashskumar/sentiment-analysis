@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis History</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Main container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>Dashboard</h2>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/history">History</a></li>
+                <li>Settings</li>
+                <li>About</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar toggle button -->
+            <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+            
+            <h1>Sentiment Analysis History</h1>
+            <div id="history-container">
+                <% if (history.length === 0) { %>
+                    <p>No history available.</p>
+                <% } else { %>
+                    <table>
+                        <tr>
+                            <th>Text</th>
+                            <th>Sentiment</th>
+                            <th>Timestamp</th>
+                        </tr>
+                        <% history.forEach(entry => { %>
+                            <tr>
+                                <td><%= entry.input_text %></td>
+                                <td><%= entry.sentiment_label %></td>
+                                <td><%= new Date(entry.created_at).toLocaleString() %></td>
+                            </tr>
+                        <% }) %>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
