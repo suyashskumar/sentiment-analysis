@@ -1,6 +1,6 @@
 node_modules/
-sentiment_model.pkl
-vectorizer.pkl
+sentiment_model.sav
+vectorizer.sav
 .venv/
 venv/
 .env
