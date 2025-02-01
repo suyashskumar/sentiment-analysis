@@ -1,58 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Quicksand:wght@300;400;500&display=swap');
+
 /* General Page Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #b49a9a;
+    font-family: 'Poppins', sans-serif; /* Set Poppins as the primary font for body text */
+    background: linear-gradient(to bottom, #A1C4FD, #C2E9FB); /* Soft Blue to Light Gray Gradient */
     margin: 0;
     padding: 0;
-}
-
-textarea {
-    width: 100%;
-    min-height: 50px; /* Minimum height */
-    max-width: 100%;
-    resize: none; /* Disable manual resizing */
-    overflow: hidden; /* Hide scrollbar */
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    margin-bottom: 20px; /* Space between textarea and button */
-}
-
-button {
-    background-color: #2c3e50; /* Green background */
-    border: none; /* Remove borders */
-    color: white; /* White text */
-    padding: 12px 24px; /* Add some padding */
-    text-align: center; /* Center the text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Display as inline-block */
-    font-size: 16px; /* Increase font size */
-    margin: 10px 0; /* Add some margin */
-    cursor: pointer; /* Add a pointer cursor on hover */
-    border-radius: 5px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth transition for hover effect */
-}
-
-button:hover {
-    background-color: #1d2833; /* Darker green on hover */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow effect */
-    transform: translateY(-2px); /* Slightly lift the button */
-}
-
-button:active {
-    transform: translateY(2px); /* Simulate a press effect */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Reduce shadow */
-}
-
-/* General styling adjustments for container */
-.container {
+    color: #333;
     display: flex;
-    height: 100vh;
+    flex-direction: column; /* Flexbox for vertical layout */
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-/* Sidebar styling */
+/* Top Banner Styles */
+.top-banner {
+    background: linear-gradient(to right, #003153, #000000); /* Gradient background */
+    color: white;
+    width: 100%;
+    padding: 10px 0;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically center content */
+    justify-content: space-between; /* Distribute space between title and nav */
+}
+
+.top-banner h1 { /* Or target the text directly if it's not in an h1 */
+    font-size: 24px;
+    font-weight: 600;
+    margin-left: 20px; /* Add some left margin */
+}
+
+.top-banner nav {
+    margin-right: 20px; /* Add some right margin */
+}
+
+.top-banner nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.top-banner nav li {
+    margin: 0 15px;
+}
+
+.top-banner nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.top-banner nav a:hover {
+    color: #1abc9c;
+}
+
+/* Sidebar Styling */
 .sidebar {
     width: 250px;
     background-color: #2c3e50;
@@ -60,16 +65,12 @@ button:active {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(0); 
-}
-
-.sidebar.active {
-    transform: translateX(-100%); /* Slide out when inactive */
+    border-radius: 10px;
 }
 
 .sidebar h2 {
     margin: 0 0 20px 0;
+    font-family: 'Lora', serif;
 }
 
 .sidebar ul {
@@ -79,117 +80,271 @@ button:active {
 }
 
 .sidebar ul li {
-    margin: 10px 0;
+    margin: 15px 0;
     cursor: pointer;
+    font-size: 18px;
     transition: color 0.3s;
+    padding-left: 10px;
 }
 
 .sidebar ul li:hover {
     color: #1abc9c;
 }
 
-/* Toggle button for sidebar */
-.toggle-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.toggle-button:hover {
-    background-color: #0056b3;
-}
-
-/* Main content styling */
+/* Main Content Styling */
 .main-content {
     flex: 1;
-    padding: 20px;
-    position: relative;
+    padding: 40px; /* Increased padding */
+    background-color: transparent; /* Make background transparent */
+    border-radius: 10px;
+    width: 95%; /* Set width to 80% of the container's width */
+    max-width: 1200px; /* Maximum width of the main content */
+    box-sizing: border-box;
+    margin: 0 auto; /* Center the content horizontally */
 }
 
-/* Error state */
-.error {
-    color: #dc3545; /* Red */
-    font-weight: bold;
-}
-
-/* Result Box Styling */
+/* Sentiment Result Box Styling */
 #result {
-    padding: 15px;
+    padding: 20px;
     margin-top: 20px;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: bold;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 600;
     text-align: center;
-    transition: background-color 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.8); 
     border: 2px solid #ccc;
+    transition: background-color 0.3s ease;
 }
 
-/* Default loading state */
 .loading {
     color: #6c757d; /* Gray */
     font-style: italic;
 }
 
-/* Sentiment-based styling */
+/* Sentiment-based Styling */
 .extremely-positive {
-    font-style: normal !important;
-    color: #00FF00; /* Dark Green for Extremely Positive (5 Star) */
-    background-color: black; 
+    color: #00FF00;
 }
 
 .slightly-positive {
-    font-style: normal !important;
-    color: #9ACD32; /* Green for Slightly Positive (4 Star) */
-    background-color: black; 
+    color: #9ACD32;
 }
 
 .neutral {
-    font-style: normal !important;
-    color: #FFFF00; /* Yellow for Neutral (3 Star) */
-    background-color: black; 
+    color: #FFFF00;
 }
 
 .slightly-negative {
-    font-style: normal !important;
-    color: #FFA500; /* Red for Slightly Negative (2 Star) */
-    background-color: black; 
+    color: #FFA500;
 }
 
 .extremely-negative {
-    font-style: normal !important;
-    color: #FF0000; /* Dark Red for Extremely Negative (1 Star) */
-    background-color: black; 
+    color: #FF0000;
 }
 
 .other {
-    font-style: normal !important;
-    color: #20d4f0; /* Violet for Other */
-    background-color: black; 
+    color: #20d4f0;
 }
 
-/* Error state */
+#result.extremely-positive, #result.slightly-positive, #result.neutral, #result.other {
+    background-color: #003153; /* Darker background for light-colored text */
+}
+
+/* Error State Styling */
 .error {
-    font-style: normal !important;
-    color: #dc3545; /* Red for error message */
+    font-style: normal;
+    color: #dc3545;
 }
 
-/* Responsive design */
+.marquee {
+    display: flex;
+    overflow: hidden; /* Hide overflow for smooth scrolling */
+    justify-content: center;
+    width: 100%; /* Occupy full width of the container */
+    margin-bottom: 20px;
+    position: relative; /* Make the marquee container relative for positioning */
+}
+
+.marquee-content {
+    display: flex;
+}
+
+.marquee img {
+    height: 175px; /* Fixed height */
+    width: 150px; /* Fixed width */
+    object-fit: cover; /* Ensures all images are the same size without distortion */
+    margin-right: 20px; /* Space between images */
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth hover transition */
+    border-radius: 10px;
+}
+
+/* Hover effect to slightly expand images */
+.marquee img:hover {
+    opacity: 1;
+    transform: scale(1.05); /* Slightly enlarge the image on hover */
+}
+
+/* Ensuring continuous loop */
+.marquee-content {
+    display: flex;
+}
+
+.about-me {
+    padding: 20px;
+    background-color: #B0D5F0  ;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.about-me h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.about-me p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Explore Section */
+.links {
+    padding: 20px;
+    background-color: #B0D5F0 ;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.links h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.links ul li {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.links ul li a {
+    color: #1abc9c;
+    text-decoration: none;
+}
+
+.links ul li a:hover {
+    text-decoration: underline;
+}
+
+/* About section background style */
+.history-box {
+    background-color: #B0D5F0; /* Change this color to match your "About Me" background */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Table width adjustments */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    word-wrap: break-word;
+    border: 1px solid #000000; /* Light grey border for table cells */
+}
+
+th {
+    width: 40%;  /* Adjust width as needed */
+}
+
+td {
+    width: 30%;  /* Adjust width as needed */
+}
+
+td:nth-child(3) {
+    width: 30%;  /* Adjust width of timestamp column */
+}
+
+.custom-input {
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    width: 80%; /* Adjust width as needed */
+    align-items: center;
+    max-width: 600px; /* Set a maximum width if desired */
+    margin: 20px auto; /* Center the container on the page */
+    white-space: nowrap;
+}
+
+.custom-input h1 {
+    font-size: 2em; /* Increase heading size */
+    margin-bottom: 20px; /* Add some space below */
+    color: #333; /* Example color */
+}
+
+.custom-input textarea {
+    width: 100%;
+    min-height: 50px; /* Minimum height */
+    max-width: 100%;
+    resize: none; /* Disable manual resizing */
+    overflow: hidden; /* Hide scrollbar */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-family: 'Lora', serif;
+    font-size: 1.2em; /* Increase text size in textarea */
+}
+
+.custom-input button {
+    background-color: #003153;
+    border: none;
+    color: white;
+    padding: 12px 24px; /* Reduced padding */
+    text-align: center;
+    font-size: 16px; /* Slightly smaller font */
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.custom-input button:hover {
+    background-color: #000000;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+}
+
+.custom-input button:active {
+    transform: translateY(2px);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
-        position: absolute;
+        position: relative;
         z-index: 1000;
         height: 100%;
     }
 
     .main-content {
-        padding: 10px;
+        padding: 15px;
+    }
+
+    .about-me, .links {
+        margin-bottom: 20px;
     }
 }

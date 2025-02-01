@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Model</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Top Banner (same as homepage) -->
+    <div class="top-banner">
+        <h1>Sentiment Analysis Custom Input</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/custom-input">Custom Input</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="custom-input"> <h1>Enter Text for Sentiment Analysis</h1> 
+            <textarea id="inputText" placeholder="Enter text to analyze sentiment" oninput="resizeTextarea()"></textarea> 
+            <button onclick="getSentiment()">Predict Sentiment</button> </div>
+            <div id="result">Your sentiment result will appear here.</div>
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

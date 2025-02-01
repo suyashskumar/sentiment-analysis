@@ -7,26 +7,25 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <!-- Main container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <h2>Dashboard</h2>
+    <!-- Top Banner (same as homepage) -->
+    <div class="top-banner">
+        <h1>Sentiment Analysis History</h1>  
+        <nav>
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/history">History</a></li>
-                <li>Settings</li>
-                <li>About</li>
+                <li><a href="/custom-input">Custom Input</a></li>
+                <li><a href="#">About</a></li>
             </ul>
-        </div>
+        </nav>
+    </div>
 
+    <!-- Main container -->
+    <div class="container">
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Sidebar toggle button -->
-            <button id="menuToggle" onclick="toggleSidebar()">☰</button>
-            
             <h1>Sentiment Analysis History</h1>
-            <div id="history-container">
+            <div id="history-container" class="history-box">
                 <% if (history.length === 0) { %>
                     <p>No history available.</p>
                 <% } else { %>
@@ -49,11 +48,6 @@
         </div>
     </div>
 
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
-    </script>
+    <script src="/js/script.js"></script>
 </body>
 </html>

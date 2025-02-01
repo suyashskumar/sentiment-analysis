@@ -101,6 +101,23 @@ app.get('/history', (req, res) => {
     res.render('history', { history: results });
   });
 });
+// **History Route**
+app.get('/history', (req, res) => {
+  const query = `SELECT input_text, sentiment_label, created_at FROM sentiment_inputs ORDER BY created_at DESC`;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching history:", err);
+      return res.status(500).send("Database query failed");
+    }
+    res.render('history', { history: results });
+  });
+});
+
+// **Custom Input Route**
+app.get('/custom-input', (req, res) => {
+  res.render('custom_input');
+});
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');

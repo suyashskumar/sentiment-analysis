@@ -7,32 +7,44 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <!-- Main container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <h2>Dashboard</h2>
+
+    <div class="top-banner">
+        <h1>Sentiment Analysis by KumPan</h1>  <nav>
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/history">History</a></li>
-                <li>Settings</li>
-                <li>About</li>
+                <li><a href="/custom-input">Custom Input</a></li>
+                <li><a href="#">About</a></li>
             </ul>
-        </div>
+        </nav>
+    </div>
 
-        <!-- Main Content -->
+    <div class="container">
         <div class="main-content">
-            <!-- Sidebar toggle button -->
-            <button id="menuToggle" onclick="toggleSidebar()">☰</button>
-            
-            <h1>Sentiment Analysis for Brand Monitoring</h1>
-            <textarea id="inputText" placeholder="Enter text to analyze sentiment" oninput="resizeTextarea()"></textarea>
-            <button onclick="getSentiment()">Predict Sentiment</button>
-            <div id="result">Your sentiment result will appear here.</div>
+            <div class="marquee">
+                <div class="marquee-content">  
+                    <img src="/images/x.webp" alt="Brand 1">
+                    <img src="/images/fb.webp" alt="Brand 2">
+                    <img src="/images/insta.webp" alt="Brand 3">
+                    <img src="/images/reddit.webp" alt="Brand 4">
+                    </div>
+            </div>
+
+            <section class="about-me">
+                <h2>About Us</h2>
+                <p>Welcome to our Sentiment Analysis Website. We have combined the skills of fullstack development, machine learning, and generative AI to form a cohesive sentiment analysis model that is unbiased and user friendly. Providing the latest trends by using our supreme web scraping tools, we aim to help monitor top brands via social media. Our machine learning algorithm leverages Naive Bayes to ensure quick output generation while maintaining the quality of our work product and our generative AI helps provide custom and unbiased feedback based on the analyzed sentiment.</p>
+            </section>
+
+            <section class="links">
+                <h3>Explore</h3>
+                <ul>
+                    <li><a href="/custom-input">Custom Input</a></li>
+                    <li><a href="/history">History</a></li>
+                </ul>
+            </section>
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="/js/script.js"></script>
 </body>
 </html>
