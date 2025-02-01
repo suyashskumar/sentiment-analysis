@@ -4,7 +4,7 @@ import os
 import pickle
 from datasets import load_dataset
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB  # Change here for Naive Bayes
 from sklearn.model_selection import train_test_split
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -35,7 +35,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, r
 vectorizer = TfidfVectorizer()
 X_train_tfidf = vectorizer.fit_transform(X_train)
 
-model = LogisticRegression(max_iter=1000)
+# Use Naive Bayes instead of Logistic Regression
+model = MultinomialNB()  # Change to Naive Bayes
 model.fit(X_train_tfidf, y_train)
 
 # Save the model and vectorizer
@@ -49,28 +50,29 @@ genai.configure(api_key=api_key)
 
 # Create the model
 generation_config = {
-  "temperature": 1,
-  "top_p": 0.95,
-  "top_k": 40,
-  "max_output_tokens": 350,
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "top_k": 30,
+  "max_output_tokens": 150,
   "response_mime_type": "text/plain",
 }
 
-model = genai.GenerativeModel(
+gen_model = genai.GenerativeModel(
   model_name="gemini-1.5-flash",
   generation_config=generation_config,
 )
 
-chat_session = model.start_chat()
+chat_session = gen_model.start_chat()
 
-# Function to predict sentiment
+# Load model and vectorizer once during initialization
+with open('./src/model.pkl', 'rb') as model_file:
+    model = pickle.load(model_file)
+with open('./src/vectorizer.pkl', 'rb') as vec_file:
+    vectorizer = pickle.load(vec_file)
+
+# Predict sentiment function (no need to load model again)
 def predict_sentiment(text):
     try:
-        with open('./src/model.pkl', 'rb') as model_file:
-            model = pickle.load(model_file)
-        with open('./src/vectorizer.pkl', 'rb') as vec_file:
-            vectorizer = pickle.load(vec_file)
-
         text_tfidf = vectorizer.transform([text])
         sentiment = model.predict(text_tfidf)[0]
         return sentiment
@@ -94,8 +96,8 @@ def sentiment_to_stars(sentiment):
 def generate_feedback(text, sentiment):
     try:
         sentiment_label = sentiment_to_stars(sentiment)
-        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback for the same. Keep it limited to 150-200 words."
-        response = model.generate_content(feedback_prompt)
+        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback in paragraph format without headers for the same."
+        response = gen_model.generate_content(feedback_prompt)
         feedback = response.text
         return feedback
     except Exception as e:
