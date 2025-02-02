@@ -146,8 +146,9 @@ body {
     color: #20d4f0;
 }
 
-#result.extremely-positive, #result.slightly-positive, #result.neutral, #result.other {
-    background-color: #003153; /* Darker background for light-colored text */
+#result.extremely-positive, #result.slightly-positive, #result.neutral, #result.other, #result.slightly-negative, #result.extremely-negative {
+    background-color: #003153;
+    font-style: normal;
 }
 
 /* Error State Styling */

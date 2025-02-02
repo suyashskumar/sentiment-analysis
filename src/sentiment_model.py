@@ -8,7 +8,7 @@ from sklearn.naive_bayes import MultinomialNB  # Change here for Naive Bayes
 from sklearn.model_selection import train_test_split
 import google.generativeai as genai
 from dotenv import load_dotenv
-from src.webscraper import scrape_comments  # Import web scraper function
+sys.path.append(os.path.abspath('./src'))  # Add the src directory to the sys.path
 
 load_dotenv()
 
@@ -105,6 +105,7 @@ def generate_feedback(text, sentiment):
 ### **NEW FUNCTION: analyzeSentiment() for multiple comments** ###
 def analyzeSentiment():
     try:
+        from webscraper import scrape_comments
         # Scrape comments using webscraper.py
         comments = scrape_comments()  # Ensure webscraper.py returns a list of comments
 

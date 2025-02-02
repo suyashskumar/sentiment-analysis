@@ -40,13 +40,28 @@ async function getSentiment() {
         // Update sentiment-based styling
         updateSentimentClass(resultElement, sentiment);
 
-        // Update line graph with new sentiment value
-        updateSentimentGraph(sentiment);
-
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
         resultElement.className = 'error';
+    }
+}
+// Function to dynamically update sentiment styling
+function updateSentimentClass(element, sentiment) {
+    element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
+
+    if (sentiment.includes('Extremely Positive')) {
+        element.classList.add('extremely-positive');
+    } else if (sentiment.includes('Slightly Positive')) {
+        element.classList.add('slightly-positive');
+    } else if (sentiment.includes('Neutral')) {
+        element.classList.add('neutral');
+    } else if (sentiment.includes('Slightly Negative')) {
+        element.classList.add('slightly-negative');
+    } else if (sentiment.includes('Extremely Negative')) {
+        element.classList.add('extremely-negative');
+    } else {
+        element.classList.add('other');
     }
 }
 
@@ -88,25 +103,6 @@ async function analyzeSentiment() {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
         resultElement.className = 'error';
-    }
-}
-
-// Function to dynamically update sentiment styling
-function updateSentimentClass(element, sentiment) {
-    element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
-
-    if (sentiment.includes('Extremely Positive')) {
-        element.classList.add('extremely-positive');
-    } else if (sentiment.includes('Slightly Positive')) {
-        element.classList.add('slightly-positive');
-    } else if (sentiment.includes('Neutral')) {
-        element.classList.add('neutral');
-    } else if (sentiment.includes('Slightly Negative')) {
-        element.classList.add('slightly-negative');
-    } else if (sentiment.includes('Extremely Negative')) {
-        element.classList.add('extremely-negative');
-    } else {
-        element.classList.add('other');
     }
 }
 
