@@ -50,6 +50,47 @@ async function getSentiment() {
     }
 }
 
+// Function to handle bulk sentiment analysis request
+async function analyzeSentiment() {
+    const resultElement = document.getElementById('result');
+    const feedbackElement = document.getElementById('analysisText'); // Feedback container
+    resultElement.innerText = 'Analyzing sentiments...';
+    resultElement.className = 'loading'; 
+
+    try {
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ /* data for analysis, e.g., scraped comments */ }),
+        });
+
+        if (!response.ok) throw new Error('Server error, please try again.');
+
+        const analysisResults = await response.json();
+        console.log('Analysis Results:', analysisResults);
+
+        // Process and display graph data
+        const graphData = analysisResults.graph_data;  // Assuming the result contains graph data
+
+        // Update sentiment graph with new sentiment values
+        graphData.forEach((sentiment) => {
+            updateSentimentGraph(sentiment);  // Update graph dynamically
+        });
+
+        // Display generative AI's analysis in the feedback section
+        const analysisText = analysisResults.analysis_summary;
+        feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisText}`;
+
+        // Update result display (if needed)
+        resultElement.innerHTML = `<strong>Sentiment Analysis Completed:</strong> <br><br>`;
+
+    } catch (error) {
+        console.error('Error:', error);
+        resultElement.innerText = 'Error occurred, please try again.';
+        resultElement.className = 'error';
+    }
+}
+
 // Function to dynamically update sentiment styling
 function updateSentimentClass(element, sentiment) {
     element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
