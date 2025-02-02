@@ -34,18 +34,22 @@ async function getSentiment() {
         console.log('Feedback:', feedback);
 
         // Display the result
-        resultElement.innerHTML = `<strong>Predicted Sentiment:</strong> ${sentiment} <br><br>
-                                   <strong>Analysis & Feedback:</strong> <br>${feedback}`;
-
-        // Update sentiment-based styling
-        updateSentimentClass(resultElement, sentiment);
+        if (resultElement) {
+            resultElement.innerHTML = `<strong>Predicted Sentiment:</strong> ${sentiment} <br><br>
+                                    <strong>Analysis & Feedback:</strong> <br>${feedback}`;
+            // Update sentiment-based styling
+            updateSentimentClass(resultElement, sentiment);
+        }
 
     } catch (error) {
         console.error('Error:', error);
-        resultElement.innerText = 'Error occurred, please try again.';
-        resultElement.className = 'error';
+        if (resultElement) {
+            resultElement.innerText = 'Error occurred, please try again.';
+            resultElement.className = 'error';
+        }
     }
 }
+
 // Function to dynamically update sentiment styling
 function updateSentimentClass(element, sentiment) {
     element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
@@ -66,17 +70,27 @@ function updateSentimentClass(element, sentiment) {
 }
 
 // Function to handle bulk sentiment analysis request
+// Function to handle sentiment analysis request
 async function analyzeSentiment() {
+    const url = document.getElementById('urlInput').value.trim();
     const resultElement = document.getElementById('result');
-    const feedbackElement = document.getElementById('analysisText'); // Feedback container
-    resultElement.innerText = 'Analyzing sentiments...';
+    const feedbackElement = document.getElementById('analysisText');
+
+    // Check for empty URL input
+    if (!url) {
+        alert('Please enter a URL.');
+        return;
+    }
+
+    // Show loading state
+    resultElement.innerText = 'Scraping and analyzing the webpage...';
     resultElement.className = 'loading'; 
 
     try {
         const response = await fetch('/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ /* data for analysis, e.g., scraped comments */ }),
+            body: JSON.stringify({ url: url }),  // Send the URL
         });
 
         if (!response.ok) throw new Error('Server error, please try again.');
@@ -85,11 +99,11 @@ async function analyzeSentiment() {
         console.log('Analysis Results:', analysisResults);
 
         // Process and display graph data
-        const graphData = analysisResults.graph_data;  // Assuming the result contains graph data
+        const graphData = analysisResults.graph_data;
 
         // Update sentiment graph with new sentiment values
         graphData.forEach((sentiment) => {
-            updateSentimentGraph(sentiment);  // Update graph dynamically
+            updateSentimentGraph(sentiment.label);  // Update graph dynamically
         });
 
         // Display generative AI's analysis in the feedback section
@@ -106,13 +120,14 @@ async function analyzeSentiment() {
     }
 }
 
+
+
 // Function to toggle sidebar visibility
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('active');
 }
 
 /** ======= Line Graph for Sentiment Trends (ADDED) ======= **/
-
 // Sentiment Mapping (0-4 Scale)
 const sentimentMap = {
     "Extremely Negative (1 Star)": 0,

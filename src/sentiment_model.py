@@ -8,6 +8,7 @@ from sklearn.naive_bayes import MultinomialNB  # Change here for Naive Bayes
 from sklearn.model_selection import train_test_split
 import google.generativeai as genai
 from dotenv import load_dotenv
+from webscraper import scrape_comments  # Assuming this scrapes comments based on URL
 sys.path.append(os.path.abspath('./src'))  # Add the src directory to the sys.path
 
 load_dotenv()
@@ -102,15 +103,15 @@ def generate_feedback(text, sentiment):
         print(f"Error in generate_feedback: {e}", file=sys.stderr)
         return "Unable to generate feedback."
 
-### **NEW FUNCTION: analyzeSentiment() for multiple comments** ###
-def analyzeSentiment():
+### **NEW FUNCTION: analyzeSentiment() for multiple comments and URL** ###
+def analyze_sentiment(url=None):
     try:
-        from webscraper import scrape_comments
-        # Scrape comments using webscraper.py
-        comments = scrape_comments()  # Ensure webscraper.py returns a list of comments
+        # If URL is provided, scrape comments from it
+        comment_response = scrape_comments(url)  # Assuming scrape_comments returns a dict
+        comments = comment_response.get("comments", [])
 
         if not comments:
-            return json.dumps({"error": "No comments found."})
+            return json.dumps({"error": "No comments found or failed to scrape comments."})
 
         sentiment_data = []
         graph_data = []
@@ -126,7 +127,9 @@ def analyzeSentiment():
         # Use generative AI to analyze trends
         analysis_prompt = f"Here is a series of sentiment values (scale 0-4) based on customer reviews: {graph_data}. Provide an analysis of this trend in simple terms."
         analysis_response = gen_model.generate_content(analysis_prompt)
-        analysis_text = analysis_response.text
+        
+        # Check if analysis response has the expected attribute
+        analysis_text = analysis_response.get('text', 'No analysis available.')
 
         # Return JSON response with sentiment data and graph analysis
         result = {
@@ -137,13 +140,16 @@ def analyzeSentiment():
         return json.dumps(result)
 
     except Exception as e:
-        print(f"Error in analyzeSentiment: {e}", file=sys.stderr)
+        print(f"Error in analyze_sentiment: {e}", file=sys.stderr)
         return json.dumps({"error": "Analysis failed."})
 
 # CLI execution
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "batch":
-        print(analyzeSentiment())
+        print(analyze_sentiment())
+    elif len(sys.argv) > 1 and sys.argv[1] == "url" and len(sys.argv) > 2:
+        url = sys.argv[2]
+        print(analyze_sentiment(url))
     else:
         text = sys.argv[1]
         sentiment = predict_sentiment(text)
