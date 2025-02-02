@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <div class="top-banner">
+        <h1>Sentiment Analysis by KumPan</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/brands">Brands</a></li>
+                <li><a href="/custom-input">Custom Input</a></li>
+                <li><a href="/history">History</a></li> 
+            </ul>
+        </nav>
+    </div>
+
+    <!-- URL Input Section -->
+    <div class="custom-input">
+        <h1>Enter a Webpage URL for Sentiment Analysis</h1>
+        <textarea id="urlInput" placeholder="Paste the webpage URL here..."></textarea>
+        <button onclick="analyzeSentiment()">Analyze</button>
+    </div>
+
+    <!-- Graph and Analysis Section -->
+    <div class="graph-analysis-container">
+        <div class="graph-box">
+            <h2>Sentiment Analysis Graph</h2>
+            <canvas id="sentimentChart"></canvas>
+        </div>
+        <div class="analysis-box">
+            <h2>Analysis</h2>
+            <p id="analysisText">Results will be displayed here after the analysis is complete.</p>
+        </div>
+    </div>
+
+    <!-- About the Webpage -->
+    <div class="about-webp">
+        <h2>About This Page</h2>
+        <p>This page allows users to input a webpage URL, scrape comments, and analyze their sentiment. The system uses machine learning to classify comments and visualize the results in a graph.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>

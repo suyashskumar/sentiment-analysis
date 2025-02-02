@@ -119,6 +119,10 @@ app.get('/custom-input', (req, res) => {
   res.render('custom_input');
 });
 
+app.get('/brands', (req, res) => {
+  res.render('brands');
+});
+
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });

@@ -40,6 +40,9 @@ async function getSentiment() {
         // Update sentiment-based styling
         updateSentimentClass(resultElement, sentiment);
 
+        // Update line graph with new sentiment value
+        updateSentimentGraph(sentiment);
+
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
@@ -69,4 +72,61 @@ function updateSentimentClass(element, sentiment) {
 // Function to toggle sidebar visibility
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('active');
+}
+
+/** ======= Line Graph for Sentiment Trends (ADDED) ======= **/
+
+// Sentiment Mapping (0-4 Scale)
+const sentimentMap = {
+    "Extremely Negative (1 Star)": 0,
+    "Slightly Negative (2 Star)": 1,
+    "Neutral (3 Star)": 2,
+    "Slightly Positive (4 Star)": 3,
+    "Extremely Positive (5 Star)": 4
+};
+
+// Create an empty line graph using Chart.js
+const ctx = document.getElementById('sentimentChart').getContext('2d');
+const sentimentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],  // X-axis: Data points (e.g., timestamps)
+        datasets: [{
+            label: 'Sentiment Score',
+            data: [],  // Y-axis: Sentiment values (0 to 4)
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2,
+            tension: 0.3, // Smooth curve
+            pointRadius: 4,
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                min: 0,
+                max: 4,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Function to update the sentiment graph dynamically
+function updateSentimentGraph(sentimentLabel) {
+    const sentimentValue = sentimentMap[sentimentLabel] ?? null;
+    if (sentimentValue === null) return;
+
+    const currentTime = new Date().toLocaleTimeString();  // Use timestamp for X-axis
+    sentimentChart.data.labels.push(currentTime);
+    sentimentChart.data.datasets[0].data.push(sentimentValue);
+
+    if (sentimentChart.data.labels.length > 10) {
+        sentimentChart.data.labels.shift();  // Remove oldest entry to keep graph readable
+        sentimentChart.data.datasets[0].data.shift();
+    }
+
+    sentimentChart.update();
 }
