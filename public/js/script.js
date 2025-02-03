@@ -70,19 +70,16 @@ function updateSentimentClass(element, sentiment) {
 }
 
 // Function to handle bulk sentiment analysis request
-// Function to handle sentiment analysis request
 async function analyzeSentiment() {
     const url = document.getElementById('urlInput').value.trim();
     const resultElement = document.getElementById('result');
     const feedbackElement = document.getElementById('analysisText');
 
-    // Check for empty URL input
     if (!url) {
         alert('Please enter a URL.');
         return;
     }
 
-    // Show loading state
     resultElement.innerText = 'Scraping and analyzing the webpage...';
     resultElement.className = 'loading'; 
 
@@ -90,37 +87,22 @@ async function analyzeSentiment() {
         const response = await fetch('/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: url }),  // Send the URL
+            body: JSON.stringify({ url: url }),
         });
 
         if (!response.ok) throw new Error('Server error, please try again.');
 
         const analysisResults = await response.json();
-        console.log('Analysis Results:', analysisResults);
 
-        // Process and display graph data
-        const graphData = analysisResults.graph_data;
-
-        // Update sentiment graph with new sentiment values
-        graphData.forEach((sentiment) => {
-            updateSentimentGraph(sentiment.label);  // Update graph dynamically
-        });
-
-        // Display generative AI's analysis in the feedback section
-        const analysisText = analysisResults.analysis_summary;
-        feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisText}`;
-
-        // Update result display (if needed)
+        // Update the result section with the analysis results
+        feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisResults.analysis_summary}`;
         resultElement.innerHTML = `<strong>Sentiment Analysis Completed:</strong> <br><br>`;
-
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
         resultElement.className = 'error';
     }
 }
-
-
 
 // Function to toggle sidebar visibility
 function toggleSidebar() {

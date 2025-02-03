@@ -89,7 +89,6 @@ app.post('/predict', (req, res) => {
 });
 
 // **History Route**
-// **History Route**
 app.get('/history', (req, res) => {
   const query = `SELECT input_text, sentiment_label, created_at FROM sentiment_inputs ORDER BY created_at DESC`;
 
@@ -123,46 +122,48 @@ app.get('/brands', (req, res) => {
   res.render('brands');
 });
 
+
+// POST route for sentiment analysis
 app.post('/analyze', async (req, res) => {
-  const { url } = req.body;
+    const { url } = req.body;
 
-  if (!url || url.trim() === '') {
-      return res.status(400).json({ error: 'URL cannot be empty' });
-  }
+    if (!url || url.trim() === '') {
+        return res.status(400).json({ error: 'URL cannot be empty' });
+    }
 
-  try {
-      const python = spawn('python', ['src/webscraper.py', url]);
+    try {
+        // Spawn the Python process and pass the URL as an argument
+        const python = spawn('python', ['src/webscraper.py', url]);
 
-      let analysisResult = '';
+        let analysisResult = '';
 
-      python.stdout.on('data', (data) => {
-          analysisResult += data.toString();
-      });
+        python.stdout.on('data', (data) => {
+            analysisResult += data.toString();
+        });
 
-      python.stderr.on('data', (data) => {
-          console.error(`stderr: ${data}`);
-      });
+        python.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
 
-      python.on('close', (code) => {
-          if (code !== 0) {
-              return res.status(500).json({ error: 'Python process failed' });
-          }
+        python.on('close', (code) => {
+            if (code !== 0) {
+                return res.status(500).json({ error: 'Python process failed' });
+            }
 
-          try {
-              const result = JSON.parse(analysisResult);
-              res.json(result);
-          } catch (error) {
-              console.error('Error parsing analysis output:', error);
-              res.status(500).json({ error: 'Failed to process sentiment analysis' });
-          }
-      });
+            try {
+                // Assuming the Python script returns the filename of the CSV
+                res.json({ message: 'Scraped data saved', filename: analysisResult.trim() });
+            } catch (error) {
+                console.error('Error parsing analysis output:', error);
+                res.status(500).json({ error: 'Failed to process sentiment analysis' });
+            }
+        });
 
-  } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Something went wrong' });
-  }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
 });
-
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
