@@ -1,63 +1,100 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from pprint import pprint
-import json
-from selenium_stealth import stealth
-usernames = ["nike", "adidas", "filaindia", "puma"]
-output = {}
-def prepare_browser():
-    chrome_options = webdriver.ChromeOptions()
-    proxy = "server:port"
-    chrome_options.add_argument(f'--proxy-server={proxy}')
-    chrome_options.add_argument("start-maximized")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option('useAutomationExtension', False)
-    driver = webdriver.Chrome(options= chrome_options)
-    stealth(driver,
-        user_agent= 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36',
-        languages= ["en-US", "en"],
-        vendor=  "Google Inc.",
-        platform=  "Win32",
-        webgl_vendor=  "Intel Inc.",
-        renderer=  "Intel Iris OpenGL Engine",
-        fix_hairline= False,
-        run_on_insecure_origins= False,
-        )
-    return driver
-def parse_data(username, user_data):
-    captions = []
-    if len(user_data['edge_owner_to_timeline_media']['edges']) > 0:
-        for node in user_data['edge_owner_to_timeline_media']['edges']:
-            if len(node['node']['edge_media_to_caption']['edges']) > 0:
-                if node['node']['edge_media_to_caption']['edges'][0]['node']['text']:
-                    captions.append(
-                        node['node']['edge_media_to_caption']['edges'][0]['node']['text']
-                    )
+import praw
+import csv
+import re
+import os
+import webbrowser
 
-    output[username] = {
-        'name': user_data['full_name'],
-        'category': user_data['category_name'],
-        'followers': user_data['edge_followed_by']['count'],
-        'posts': captions,
-    }
-def scrape(username):
-    url = f'https://instagram.com/{username}/?__a=1&__d=dis'
-    chrome = prepare_browser()
-    chrome.get(url)
-    print (f"Attempting: {chrome.current_url}")
-    if "login" in chrome.current_url:
-        print ("Failed/ redir to login")
-        chrome.quit()
-    else:
-        print ("Success")
-        resp_body = chrome.find_element(By.TAG_NAME, "body").text
-        data_json = json.loads(resp_body)
-        user_data = data_json['graphql']['user']
-        parse_data(username, user_data)
-        chrome.quit()
-def main():
-    for username in usernames:
-        scrape(username)
-if __name__ == '__main__':
-    main()
-    pprint(output)
+# Reddit API Credentials (Replace with your actual credentials)
+REDDIT_CLIENT_ID = "PxnLYXKRvVpFSsNC_MbVig"
+REDDIT_CLIENT_SECRET = "OOb1skWiIZ5sots36w3HOruYeD9b9A"
+REDDIT_USER_AGENT = "script:sentiment-analysis:v1.0 (by u/MolassesWrong4174)"
+REDIRECT_URI = "http://localhost:3000"  # Update with your redirect URI
+SCOPES = ['identity', 'read']
+
+# OAuth2 Reddit Authentication Flow
+reddit = praw.Reddit(
+    client_id=REDDIT_CLIENT_ID,
+    client_secret=REDDIT_CLIENT_SECRET,
+    user_agent=REDDIT_USER_AGENT,
+    redirect_uri=REDIRECT_URI  # Ensure that redirect URI is specified here
+)
+
+def authenticate():
+    """Authenticate and authorize the script via OAuth."""
+    auth_url = reddit.auth.url(scopes=SCOPES, state="unique_state", duration="permanent")
+    print(f"Please go to this URL to authenticate: {auth_url}")
+    webbrowser.open(auth_url)
+
+    # Get the authorization code from the user
+    code = input("Enter the authorization code from the URL: ")
+
+    # Get access token
+    access_token = reddit.auth.authorize(code)
+    print("Access Token:", access_token)
+    return reddit
+
+# Run the function for authentication if required
+if __name__ == "__main__":
+    reddit = authenticate()
+
+# Function to extract the post ID from the URL
+def extract_post_id(url):
+    """Extracts the post ID from a Reddit URL."""
+    match = re.search(r"comments/([a-z0-9]+)/", url)
+    return match.group(1) if match else None
+
+# Function to scrape comments from Reddit
+def scrape_comments(url):
+    """
+    Scrapes comments from a Reddit post or subreddit URL.
+    Returns a CSV file with the scraped data.
+    """
+    post_id = extract_post_id(url)
+    
+    if post_id:  # If URL is for a single post
+        submission = reddit.submission(id=post_id)
+        submission.comments.replace_more(limit=0)  # Load all top-level comments
+
+        comments = []
+        for comment in submission.comments.list():
+            comments.append([
+                submission.title,
+                comment.author.name if comment.author else "[deleted]",
+                comment.body,
+                comment.score,
+                comment.created_utc
+            ])
+
+        filename = "reddit_comments.csv"
+    
+    else:  # If URL is for a subreddit
+        subreddit_name = url.rstrip('/').split('/')[-1]
+        subreddit = reddit.subreddit(subreddit_name)
+        comments = []
+
+        for submission in subreddit.hot(limit=10):  # Scrape top 10 posts
+            submission.comments.replace_more(limit=0)
+            for comment in submission.comments.list():
+                comments.append([
+                    submission.title,
+                    comment.author.name if comment.author else "[deleted]",
+                    comment.body,
+                    comment.score,
+                    comment.created_utc
+                ])
+
+        filename = f"{subreddit_name}_comments.csv"
+
+    # Save to CSV
+    with open(filename, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Post Title", "Author", "Comment", "Score", "Created UTC"])
+        writer.writerows(comments)
+
+    return filename  # Return filename for frontend handling
+
+# Run the function with the manually set URL
+if __name__ == "__main__":
+    REDDIT_URL = "https://www.reddit.com/r/Nike/"  # Replace with actual Reddit URL
+    output_file = scrape_comments(REDDIT_URL)
+    print(f"Scraped data saved to {output_file}")
