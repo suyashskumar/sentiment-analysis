@@ -1,27 +1,30 @@
 # Sentiment Analysis for Brand Monitoring
 
-This project is a sentiment analysis application that predicts sentiment from text input and provides feedback using a generative AI model. It includes a web-based frontend for user interaction and a backend powered by Python and Node.js.
+This project is a sentiment analysis application that predicts sentiment from text input and provides feedback using a generative AI model. It includes a web-based frontend for user interaction and a backend powered by Python, Node.js, and MySQL for data storage.
 
 ## Features
 
-1. **Sentiment Analysis**: Classifies the sentiment of text as Extremely Negative, Slightly Negative, Neutral, Slightly Positive, or Extremely Positive.
-2. **Feedback Generation**: Provides detailed feedback explaining the sentiment using a generative AI model.
-3. **Dynamic User Interface**: Includes real-time feedback display and dynamic styling based on sentiment.
-4. **Interactive Sidebar**: Toggleable sidebar for enhanced user navigation.
+1. **Sentiment Analysis**: Classifies sentiment as Extremely Negative, Slightly Negative, Neutral, Slightly Positive, or Extremely Positive.
+2. **Feedback Generation**: Provides detailed AI-generated feedback explaining the sentiment.
+3. **Brand Monitoring**: Scrapes and analyzes sentiment from brand-related web pages.
+4. **Database Storage**: Stores user inputs, sentiment analysis results, and monitored brand data.
+5. **Interactive User Interface**: Real-time feedback display and dynamic UI elements.
+6. **History Tracking**: Allows users to view past sentiment analyses.
 
 ## Technologies Used
 
 - **Backend**:
-  - Python for sentiment analysis and generative AI integration.
-  - Node.js and Express.js for serving the web application and handling API requests.
+  - Python for sentiment analysis and AI integration.
+  - Node.js and Express.js for handling API requests.
+  - MySQL for database storage.
 - **Frontend**:
-  - HTML, CSS, and JavaScript for the user interface.
-  - EJS templates for rendering dynamic content.
+  - HTML, CSS, and JavaScript for UI.
+  - EJS templates for dynamic content rendering.
 - **Dependencies**:
-  - `scikit-learn` for text vectorization and logistic regression.
-  - `google-generativeai` for AI-driven feedback generation.
-  - `datasets` for loading and managing text data.
-  - `dotenv` for managing environment variables.
+  - `scikit-learn` for text vectorization and classification.
+  - `google-generativeai` for AI-driven feedback.
+  - `praw` for Reddit scraping.
+  - `dotenv` for environment variable management.
 
 ## Installation
 
@@ -29,6 +32,7 @@ This project is a sentiment analysis application that predicts sentiment from te
 
 - Python 3.8 or higher
 - Node.js and npm
+- MySQL database
 - Git
 - Virtual environment (optional but recommended)
 
@@ -52,14 +56,22 @@ This project is a sentiment analysis application that predicts sentiment from te
    npm install
    ```
 
-4. Create a `.env` file in the root directory:
-   ```plaintext
-   API_KEY=your_google_genai_api_key
-   ```
+4. Set up the MySQL database:
+   - Create a MySQL database and user.
+   - Execute `sentiment_analysis.sql` in your MySQL instance:
+     ```bash
+     mysql -u your_user -p your_database < sentiment_analysis.sql
+     ```
+   - Configure database credentials in `.env`:
+     ```plaintext
+     DB_HOST=your_db_host
+     DB_USER=your_db_user
+     DB_PASSWORD=your_db_password
+     DB_NAME=sentiment_analysis
+     API_KEY=your_google_genai_api_key
+     ```
 
-   Replace `your_google_genai_api_key` with your actual API key.
-
-5. Run the server:
+5. Run the Node.js server:
    ```bash
    npm start
    ```
@@ -68,7 +80,21 @@ This project is a sentiment analysis application that predicts sentiment from te
    node app.js
    ```
 
-7. Access the application at `http://localhost:3000`.
+6. Access the application at `http://localhost:3000`.
+
+## Database Schema
+
+- **`sentiment_inputs`**: Stores user-inputted text and sentiment results.
+  - `id` (INT, Primary Key, Auto Increment)
+  - `input_text` (TEXT, User input)
+  - `sentiment_label` (VARCHAR, Sentiment classification)
+  - `created_at` (TIMESTAMP, Default: CURRENT_TIMESTAMP)
+
+- **`brand_monitoring`**: Stores monitored brands and scraped webpage links.
+  - `id` (INT, Primary Key, Auto Increment)
+  - `brand_name` (VARCHAR, Unique, Brand name)
+  - `scraped_page_link` (VARCHAR, Scraped URL)
+  - `created_at` (TIMESTAMP, Default: CURRENT_TIMESTAMP)
 
 ## File Structure
 
@@ -76,11 +102,18 @@ This project is a sentiment analysis application that predicts sentiment from te
 sentiment-analysis/
 ├── public/                   # Static assets (CSS, JavaScript, images)
 ├── src/                      # Python scripts
-│   ├── sentiment_model.py    # Python script for sentiment prediction
-├── views/                    # EJS templates
-│   ├── index.ejs             # Main web page
+│   ├── sentiment_model.py    # Sentiment prediction and feedback generation
+│   ├── webscraper.py         # Scrapes data from Reddit and webpages
+│   ├── csv_generator.py      # Handles CSV export of sentiment data
+├── views/                    # EJS templates for frontend rendering
+│   ├── index.ejs             # Home page
+│   ├── history.ejs           # Past sentiment results
+│   ├── custom_input.ejs      # Manual sentiment input
+│   ├── brands.ejs            # Brand sentiment analysis
+├── database/                 # Database scripts
+│   ├── sentiment_analysis.sql # Database schema
 ├── .env                      # Environment variables
-├── app.js                    # Node.js server
+├── app.js                    # Node.js backend
 ├── requirements.txt          # Python dependencies
 ├── package.json              # Node.js dependencies
 └── README.md                 # Project documentation
@@ -89,26 +122,30 @@ sentiment-analysis/
 ## Usage
 
 1. Open the web application in your browser.
-2. Enter the text to analyze in the input box.
-3. Submit the text to receive sentiment prediction and feedback.
-4. The application dynamically updates the interface to reflect the sentiment.
+2. Enter text manually or analyze a brand’s sentiment from a scraped webpage.
+3. View sentiment classification and AI-generated feedback.
+4. Monitor brand sentiment over time using the history page.
 
 ## Key Functions
 
 ### Python Backend
-- **`predict_sentiment(text)`**: Predicts sentiment based on input text using logistic regression.
-- **`generate_feedback(text, sentiment)`**: Generates feedback using a generative AI model.
+- **`analyze_sentiment(text)`**: Uses Naive Bayes to classify sentiment.
+- **`generate_feedback(text, sentiment)`**: AI-generated explanation for the sentiment.
+- **`scrape_reddit(subreddit, limit)`**: Extracts posts for sentiment analysis.
 
 ### Frontend JavaScript
-- **`resizeTextarea()`**: Dynamically adjusts the height of the input textarea.
-- **`getSentiment()`**: Sends text input to the backend and displays sentiment and feedback.
-- **`toggleSidebar()`**: Toggles the visibility of the sidebar.
+- **`resizeTextarea()`**: Dynamically adjusts the textarea height.
+- **`analyzeSentiment()`**: Calls the `/analyze` endpoint to process text.
+- **`toggleSidebar()`**: Toggles the sidebar navigation.
 
 ### Node.js Server
-- **`/`**: Serves the index page.
-- **`/predict`**: Handles POST requests for sentiment analysis and feedback generation.
+- **`/`**: Serves the home page.
+- **`/analyze`**: Triggers sentiment analysis and returns results.
+- **`/history`**: Retrieves past sentiment analysis records.
+- **`/brands`**: Allows brand monitoring and sentiment tracking.
 
 ## Acknowledgements
 
-- **Hugging Face** for the dataset.
-- **Google Generative AI** for feedback generation.
+- **Hugging Face** for datasets.
+- **Google Generative AI** for sentiment feedback.
+- **PRAW** for Reddit data extraction.

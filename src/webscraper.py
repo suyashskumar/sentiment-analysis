@@ -6,10 +6,16 @@ import sys
 import webbrowser
 
 # Reddit API Credentials (Replace with your actual credentials)
-REDDIT_CLIENT_ID = "PxnLYXKRvVpFSsNC_MbVig"
-REDDIT_CLIENT_SECRET = "OOb1skWiIZ5sots36w3HOruYeD9b9A"
-REDDIT_USER_AGENT = "script:sentiment-analysis:v1.0 (by u/MolassesWrong4174)"
-REDIRECT_URI = "http://localhost:3000/brands"  # Update with your redirect URI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Reddit API Credentials from .env file
+REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
+REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
+REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT")
+REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:3000/brands")  # Default value
 SCOPES = ['identity', 'read']
 
 # OAuth2 Reddit Authentication Flow
