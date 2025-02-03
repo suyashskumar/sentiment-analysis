@@ -21,7 +21,7 @@ if not os.path.exists(csv_path):
     sys.exit(1)
  
 dataset = pd.read_csv(csv_path)
- 
+dataset.columns = dataset.columns.str.lower()
 # Prepare the data
 X = dataset['comment']
 y = dataset['sentiment']
@@ -92,7 +92,7 @@ def sentiment_to_stars(sentiment):
 def generate_feedback(text, sentiment):
     try:
         sentiment_label = sentiment_to_stars(sentiment)
-        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback in paragraph format without headers."
+        feedback_prompt = f"Analyze why {text} is considered {sentiment_label} by the customer who provided the input. Provide feedback in paragraph format without headers. Limit it to 100 words max."
         response = gen_model.generate_content(feedback_prompt)
         return response.text
     except Exception as e:

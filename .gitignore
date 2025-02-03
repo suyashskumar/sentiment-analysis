@@ -8,3 +8,4 @@ credentials.json
 token.json
 __pycache__/
 *.csv
+src/*.csv

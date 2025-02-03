@@ -8,7 +8,7 @@ import webbrowser
 REDDIT_CLIENT_ID = "PxnLYXKRvVpFSsNC_MbVig"
 REDDIT_CLIENT_SECRET = "OOb1skWiIZ5sots36w3HOruYeD9b9A"
 REDDIT_USER_AGENT = "script:sentiment-analysis:v1.0 (by u/MolassesWrong4174)"
-REDIRECT_URI = "http://localhost:3000"  # Update with your redirect URI
+REDIRECT_URI = "http://localhost:3000/brands"  # Update with your redirect URI
 SCOPES = ['identity', 'read']
 
 # OAuth2 Reddit Authentication Flow
