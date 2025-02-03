@@ -80,7 +80,7 @@ async function analyzeSentiment() {
         return;
     }
 
-    resultElement.innerText = 'Scraping and analyzing the webpage...';
+    resultElement.innerText = 'Collecting data...';
     resultElement.className = 'loading'; 
 
     try {
@@ -97,6 +97,8 @@ async function analyzeSentiment() {
         // Update the result section with the analysis results
         feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisResults.analysis_summary}`;
         resultElement.innerHTML = `<strong>Sentiment Analysis Completed:</strong> <br><br>`;
+        resultElement.innerText = 'Analysis Complete!';
+        resultElement.classList.remove('loading');
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = 'Error occurred, please try again.';
