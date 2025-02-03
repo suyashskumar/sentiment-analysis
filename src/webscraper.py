@@ -2,6 +2,7 @@ import praw
 import csv
 import re
 import os
+import sys
 import webbrowser
 
 # Reddit API Credentials (Replace with your actual credentials)
@@ -32,10 +33,6 @@ def authenticate():
     access_token = reddit.auth.authorize(code)
     print("Access Token:", access_token)
     return reddit
-
-# Run the function for authentication if required
-if __name__ == "__main__":
-    reddit = authenticate()
 
 # Function to extract the post ID from the URL
 def extract_post_id(url):
@@ -93,8 +90,13 @@ def scrape_comments(url):
 
     return filename  # Return filename for frontend handling
 
-# Run the function with the manually set URL
+# **Command-line Execution for Node.js Integration**
 if __name__ == "__main__":
-    REDDIT_URL = "https://www.reddit.com/r/Nike/"  # Replace with actual Reddit URL
-    output_file = scrape_comments(REDDIT_URL)
-    print(f"Scraped data saved to {output_file}")
+    if len(sys.argv) < 2:
+        print("Error: No URL provided", file=sys.stderr)
+        sys.exit(1)
+
+    url = sys.argv[1]  # Get URL from command-line argument
+    scraped_filename = scrape_comments(url)
+    
+    print(scraped_filename)  # Send output to app.js

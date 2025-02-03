@@ -100,18 +100,6 @@ app.get('/history', (req, res) => {
     res.render('history', { history: results });
   });
 });
-// **History Route**
-app.get('/history', (req, res) => {
-  const query = `SELECT input_text, sentiment_label, created_at FROM sentiment_inputs ORDER BY created_at DESC`;
-
-  connection.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching history:", err);
-      return res.status(500).send("Database query failed");
-    }
-    res.render('history', { history: results });
-  });
-});
 
 // **Custom Input Route**
 app.get('/custom-input', (req, res) => {
@@ -122,8 +110,7 @@ app.get('/brands', (req, res) => {
   res.render('brands');
 });
 
-
-// POST route for sentiment analysis
+// **Web Scraping Route**
 app.post('/analyze', async (req, res) => {
     const { url } = req.body;
 
@@ -132,13 +119,15 @@ app.post('/analyze', async (req, res) => {
     }
 
     try {
-        // Spawn the Python process and pass the URL as an argument
+        console.log(`Scraping data from: ${url}`);
+
+        // Spawn the Python scraper
         const python = spawn('python', ['src/webscraper.py', url]);
 
-        let analysisResult = '';
+        let scrapedData = '';
 
         python.stdout.on('data', (data) => {
-            analysisResult += data.toString();
+            scrapedData += data.toString();
         });
 
         python.stderr.on('data', (data) => {
@@ -147,15 +136,14 @@ app.post('/analyze', async (req, res) => {
 
         python.on('close', (code) => {
             if (code !== 0) {
-                return res.status(500).json({ error: 'Python process failed' });
+                return res.status(500).json({ error: 'Python scraping process failed' });
             }
 
             try {
-                // Assuming the Python script returns the filename of the CSV
-                res.json({ message: 'Scraped data saved', filename: analysisResult.trim() });
+                res.json({ message: 'Scraped data saved', filename: scrapedData.trim() });
             } catch (error) {
-                console.error('Error parsing analysis output:', error);
-                res.status(500).json({ error: 'Failed to process sentiment analysis' });
+                console.error('Error processing scraped output:', error);
+                res.status(500).json({ error: 'Failed to process scraped data' });
             }
         });
 
