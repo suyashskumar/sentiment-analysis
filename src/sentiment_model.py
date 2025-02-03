@@ -8,7 +8,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
 import google.generativeai as genai
 from dotenv import load_dotenv
-from webscraper import scrape_comments  # Assuming this scrapes comments based on URL
+from webscraper import scrape_comments
  
 sys.path.append(os.path.abspath('./src'))  # Add the src directory to sys.path
  
@@ -100,35 +100,59 @@ def generate_feedback(text, sentiment):
         return "Unable to generate feedback."
  
 # Analyze sentiment for multiple comments (from URL)
+
 def analyze_sentiment(url=None):
     try:
+        # Ensure `url` is a dictionary if passed as a JSON string
+        if isinstance(url, str):
+            try:
+                url = json.loads(url)  # Convert JSON string to dictionary
+            except json.JSONDecodeError:
+                return json.dumps({"error": "Invalid JSON input"})
+
+        if not isinstance(url, dict) or "url" not in url:
+            return json.dumps({"error": "Missing or invalid 'url' parameter."})
+
+        url = url["url"]  # Extract the actual URL
+
         comment_response = scrape_comments(url)
+
+        if not isinstance(comment_response, dict):  # Ensure we get a dictionary
+            return json.dumps({"error": "Invalid response from scrape_comments"})
+
         comments = comment_response.get("comments", [])
- 
+
         if not comments:
             return json.dumps({"error": "No comments found or failed to scrape comments."})
- 
+
         sentiment_data = []
         graph_data = []
- 
+
         for comment in comments:
             sentiment = predict_sentiment(comment)
             sentiment_label = sentiment_to_stars(sentiment)
             sentiment_data.append({"comment": comment, "sentiment": sentiment_label})
- 
             graph_data.append(sentiment)
- 
+
+        print(f"Graph Data: {graph_data}", file=sys.stderr)
+
         analysis_prompt = f"Here is a series of sentiment values (scale 0-4) based on customer reviews: {graph_data}. Provide an analysis of this trend in simple terms."
         analysis_response = gen_model.generate_content(analysis_prompt)
+
+        print(f"Analysis Response: {analysis_response}", file=sys.stderr)
+
+        if not isinstance(analysis_response, dict):
+            return json.dumps({"error": "Invalid response from analysis model."})
+
         analysis_text = analysis_response.get('text', 'No analysis available.')
- 
+
         result = {
             "sentiment_data": sentiment_data,
             "graph_data": graph_data,
             "analysis_summary": analysis_text
         }
         return json.dumps(result)
- 
+
     except Exception as e:
         print(f"Error in analyze_sentiment: {e}", file=sys.stderr)
         return json.dumps({"error": "Analysis failed."})
