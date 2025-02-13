@@ -68,7 +68,8 @@ def scrape_comments(url):
                 comment.created_utc
             ])
 
-        filename = "reddit_comments.csv"
+        src_directory = os.path.dirname(os.path.abspath(__file__))  # 'src/' directory
+        filename = os.path.join(src_directory, "reddit_comments.csv")
     
     else:  # If URL is for a subreddit
         subreddit_name = url.rstrip('/').split('/')[-1]
@@ -86,7 +87,8 @@ def scrape_comments(url):
                     comment.created_utc
                 ])
 
-        filename = "reddit_comments.csv"
+        src_directory = os.path.dirname(os.path.abspath(__file__))  # 'src/' directory
+        filename = os.path.join(src_directory, "reddit_comments.csv")
 
     # Save to CSV
     with open(filename, "w", newline="", encoding="utf-8") as file:
