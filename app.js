@@ -110,62 +110,56 @@ app.get('/brands', (req, res) => {
   res.render('brands');
 });
 
-// **Web Scraping Route**
 app.post('/analyze', async (req, res) => {
   const { url } = req.body;
 
   if (!url || url.trim() === '') {
-      return res.status(400).json({ error: 'URL cannot be empty' });
+    return res.status(400).json({ error: 'URL cannot be empty' });
   }
 
   try {
-      console.log(`Scraping data from: ${url}`);
+    console.log(`Scraping data from: ${url}`);
 
-      // Spawn the Python scraper
-      const scraper = spawn('python', ['src/webscraper.py', url]);
+    // Step 1: Spawn the Python scraper
+    const scraper = spawn('python', ['src/webscraper.py', url]);
 
-      scraper.stderr.on('data', (data) => {
-          console.error(`Scraper stderr: ${data}`);
+    scraper.stderr.on('data', (data) => {
+      console.error(`Scraper stderr: ${data}`);
+    });
+
+    scraper.on('close', (code) => {
+      if (code !== 0) {
+        return res.status(500).json({ error: 'Scraping process failed' });
+      }
+
+      console.log('Scraping complete, starting sentiment analysis...');
+
+      // Step 2: Run sentiment analysis (which also generates the graph)
+      const analyzer = spawn('python', ['src/sentiment_model2.py']);
+
+      let analysisResult = '';
+
+      analyzer.stdout.on('data', (data) => {
+        analysisResult += data.toString();
       });
 
-      scraper.on('close', (code) => {
-          if (code !== 0) {
-              return res.status(500).json({ error: 'Scraping process failed' });
-          }
-
-          console.log('Scraping complete, starting sentiment analysis...');
-
-          // Spawn sentiment_model.py for analysis
-          const analyzer = spawn('python', ['src/sentiment_model.py', 'url', url]);
-
-          let analysisResult = '';
-
-          analyzer.stdout.on('data', (data) => {
-              analysisResult += data.toString();
-          });
-
-          analyzer.stderr.on('data', (data) => {
-              console.error(`Analyzer stderr: ${data}`);
-          });
-
-          analyzer.on('close', (code) => {
-              if (code !== 0) {
-                  return res.status(500).json({ error: 'Sentiment analysis failed' });
-              }
-
-              try {
-                  const result = JSON.parse(analysisResult);
-                  res.json(result);
-              } catch (error) {
-                  console.error('Error parsing analysis result:', error);
-                  res.status(500).json({ error: 'Failed to process sentiment analysis data' });
-              }
-          });
+      analyzer.stderr.on('data', (data) => {
+        console.error(`Analyzer stderr: ${data}`);
       });
+
+      analyzer.on('close', (code) => {
+        if (code !== 0) {
+          return res.status(500).json({ error: 'Sentiment analysis failed' });
+        }
+
+        console.log('Sentiment analysis complete. Graph generated.');
+        res.json({ message: 'Analysis complete. Sentiment graph ready.' });
+      });
+    });
 
   } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Something went wrong' });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 });
 
