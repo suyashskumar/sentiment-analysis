@@ -19,3 +19,18 @@ CREATE TABLE IF NOT EXISTS brand_monitoring (
     scraped_page_link VARCHAR(255), -- Link to the scraped webpage
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of entry
 );
+
+-- Table to store bulk sentiment results from CSV analysis
+CREATE TABLE bulk_sentiment_results (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255),
+    Comment TEXT,
+    sentiment_score INT
+);
+
+CREATE TABLE scraped_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    url VARCHAR(255) NOT NULL,
+    scraped_content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

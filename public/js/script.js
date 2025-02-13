@@ -5,18 +5,22 @@ function resizeTextarea() {
     textarea.style.height = `${textarea.scrollHeight}px`;  // Adjust height dynamically
 }
 
-// Function to handle sentiment analysis request
+// Function to handle single sentiment analysis request
 async function getSentiment() {
-    const text = document.getElementById('inputText').value.trim();
+    const textarea = document.getElementById('inputText');
+    if (!textarea) {
+        alert('Text input field not found!');
+        return;
+    }
+
+    const text = textarea.value.trim();
     const resultElement = document.getElementById('result');
 
-    // Check for empty input
     if (!text) {
         alert('Please enter some text.');
         return;
     }
 
-    // Show loading state
     resultElement.innerText = 'Analyzing sentiment...';
     resultElement.className = 'loading'; 
 
@@ -27,47 +31,25 @@ async function getSentiment() {
             body: JSON.stringify({ text }),
         });
 
-        if (!response.ok) throw new Error('Server error, please try again.');
+        if (!response.ok) {
+            const errorData = await response.text();  // Get server error message
+            throw new Error(`Server Error: ${errorData}`);
+        }
 
         const { sentiment, feedback } = await response.json();
         console.log('Sentiment:', sentiment);
         console.log('Feedback:', feedback);
 
-        // Display the result
-        if (resultElement) {
-            resultElement.innerHTML = `<strong>Predicted Sentiment:</strong> ${sentiment} <br><br>
-                                    <strong>Analysis & Feedback:</strong> <br>${feedback}`;
-            // Update sentiment-based styling
-            updateSentimentClass(resultElement, sentiment);
-        }
-
+        resultElement.innerHTML = `<strong>Predicted Sentiment:</strong> ${sentiment} <br><br>
+                                   <strong>Analysis & Feedback:</strong> <br>${feedback}`;
+        updateSentimentClass(resultElement, sentiment);
     } catch (error) {
         console.error('Error:', error);
-        if (resultElement) {
-            resultElement.innerText = 'Error occurred, please try again.';
-            resultElement.className = 'error';
-        }
+        resultElement.innerText = `Error occurred: ${error.message}`;
+        resultElement.className = 'error';
     }
 }
 
-// Function to dynamically update sentiment styling
-function updateSentimentClass(element, sentiment) {
-    element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
-
-    if (sentiment.includes('Extremely Positive')) {
-        element.classList.add('extremely-positive');
-    } else if (sentiment.includes('Slightly Positive')) {
-        element.classList.add('slightly-positive');
-    } else if (sentiment.includes('Neutral')) {
-        element.classList.add('neutral');
-    } else if (sentiment.includes('Slightly Negative')) {
-        element.classList.add('slightly-negative');
-    } else if (sentiment.includes('Extremely Negative')) {
-        element.classList.add('extremely-negative');
-    } else {
-        element.classList.add('other');
-    }
-}
 
 // Function to handle bulk sentiment analysis request
 async function analyzeSentiment() {
@@ -90,19 +72,40 @@ async function analyzeSentiment() {
             body: JSON.stringify({ url: url }),
         });
 
-        if (!response.ok) throw new Error('Server error, please try again.');
+        if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`Server Error: ${errorData}`);
+        }
 
         const analysisResults = await response.json();
 
-        // Update the result section with the analysis results
         feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisResults.analysis_summary}`;
-        resultElement.innerHTML = `<strong>Sentiment Analysis Completed:</strong> <br><br>`;
         resultElement.innerText = 'Analysis Complete!';
         resultElement.classList.remove('loading');
     } catch (error) {
         console.error('Error:', error);
-        resultElement.innerText = 'Error occurred, please try again.';
+        resultElement.innerText = `Error occurred: ${error.message}`;
         resultElement.className = 'error';
+    }
+}
+
+
+// Function to dynamically update sentiment styling
+function updateSentimentClass(element, sentiment) {
+    element.classList.remove('extremely-positive', 'slightly-positive', 'neutral', 'slightly-negative', 'extremely-negative', 'other');
+
+    if (sentiment.includes('Extremely Positive')) {
+        element.classList.add('extremely-positive');
+    } else if (sentiment.includes('Slightly Positive')) {
+        element.classList.add('slightly-positive');
+    } else if (sentiment.includes('Neutral')) {
+        element.classList.add('neutral');
+    } else if (sentiment.includes('Slightly Negative')) {
+        element.classList.add('slightly-negative');
+    } else if (sentiment.includes('Extremely Negative')) {
+        element.classList.add('extremely-negative');
+    } else {
+        element.classList.add('other');
     }
 }
 
@@ -111,8 +114,7 @@ function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('active');
 }
 
-/** ======= Line Graph for Sentiment Trends (ADDED) ======= **/
-// Sentiment Mapping (0-4 Scale)
+/** ======= Line Graph for Sentiment Trends (UPDATED) ======= **/
 const sentimentMap = {
     "Extremely Negative (1 Star)": 0,
     "Slightly Negative (2 Star)": 1,
@@ -121,19 +123,18 @@ const sentimentMap = {
     "Extremely Positive (5 Star)": 4
 };
 
-// Create an empty line graph using Chart.js
 const ctx = document.getElementById('sentimentChart').getContext('2d');
 const sentimentChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: [],  // X-axis: Data points (e.g., timestamps)
+        labels: [],
         datasets: [{
             label: 'Sentiment Score',
-            data: [],  // Y-axis: Sentiment values (0 to 4)
+            data: [],
             borderColor: 'rgba(75, 192, 192, 1)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderWidth: 2,
-            tension: 0.3, // Smooth curve
+            tension: 0.3,
             pointRadius: 4,
         }]
     },
@@ -155,12 +156,12 @@ function updateSentimentGraph(sentimentLabel) {
     const sentimentValue = sentimentMap[sentimentLabel] ?? null;
     if (sentimentValue === null) return;
 
-    const currentTime = new Date().toLocaleTimeString();  // Use timestamp for X-axis
+    const currentTime = new Date().toLocaleTimeString();
     sentimentChart.data.labels.push(currentTime);
     sentimentChart.data.datasets[0].data.push(sentimentValue);
 
     if (sentimentChart.data.labels.length > 10) {
-        sentimentChart.data.labels.shift();  // Remove oldest entry to keep graph readable
+        sentimentChart.data.labels.shift();
         sentimentChart.data.datasets[0].data.shift();
     }
 

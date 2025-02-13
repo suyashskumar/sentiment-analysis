@@ -15,7 +15,7 @@ load_dotenv()
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
 REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT")
-REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:3000/brands")  # Default value
+REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:3000/brands") 
 SCOPES = ['identity', 'read']
 
 # OAuth2 Reddit Authentication Flow
@@ -86,7 +86,7 @@ def scrape_comments(url):
                     comment.created_utc
                 ])
 
-        filename = f"{subreddit_name}_comments.csv"
+        filename = "reddit_comments.csv"
 
     # Save to CSV
     with open(filename, "w", newline="", encoding="utf-8") as file:
