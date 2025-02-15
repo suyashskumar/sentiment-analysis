@@ -118,7 +118,7 @@ hindi_comments = {
  
 # Generating data
 data = []
-for i in range(330):
+for i in range(1000):
     for category in [normal_comments, sarcastic_comments, hindi_comments]:
         sentiment = i % 5  # Ensuring even distribution of sentiments 0-4
         comment = random.choice(category[sentiment])

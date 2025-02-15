@@ -92,7 +92,7 @@ def analyze_graph_with_ai(sentiment_counts):
         prompt = (
             f"Analyze the following sentiment distribution and provide insights:\n\n"
             f"{sentiment_summary}\n\n"
-            f"Describe any trends, unusual patterns, or key observations."
+            f"Describe any trends, unusual patterns, or key observations. Do not bold words and stick to one simple paragraph of 100 words."
         )
 
         # Send the text-based prompt to Gemini AI
