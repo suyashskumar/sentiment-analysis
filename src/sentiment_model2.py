@@ -40,10 +40,16 @@ dataset.columns = dataset.columns.str.lower()
 
 # Generate sentiment distribution graph
 def generate_sentiment_distribution(sentiment_data):
-    sentiment_counts = sentiment_data.value_counts()
-    sentiment_counts.plot(kind='bar', title="Sentiment Distribution")
-    plt.xlabel('Sentiment Labels')
-    plt.ylabel('Frequency')
+    sentiment_counts = sentiment_data.value_counts().sort_index()
+    
+    plt.figure(figsize=(8, 5))
+    plt.plot(sentiment_counts.index, sentiment_counts.values, marker='o', linestyle='-', color='b')
+    
+    plt.title("Sentiment Distribution (Line Graph)")
+    plt.xlabel("Sentiment Labels")
+    plt.ylabel("Frequency")
+    plt.grid(True)
+    
     plt.show()
 
 # Bulk sentiment analysis
