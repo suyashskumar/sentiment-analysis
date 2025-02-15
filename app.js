@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { spawn } = require('child_process');
+const fs = require('fs');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -134,7 +135,7 @@ app.post('/analyze', async (req, res) => {
 
       console.log('Scraping complete, starting sentiment analysis...');
 
-      // Step 2: Run sentiment analysis (which also generates the graph)
+      // Step 2: Run sentiment analysis (which generates the graph)
       const analyzer = spawn('python', ['src/sentiment_model2.py', 'batch']);
 
       let analysisResult = '';
@@ -153,7 +154,22 @@ app.post('/analyze', async (req, res) => {
         }
 
         console.log('Sentiment analysis complete. Graph generated.');
-        res.json({ message: 'Analysis complete. Sentiment graph ready.' });
+
+        // Fixed path to the graph
+        const graphImageUrl = '/sentiment_distribution.png';
+        const analysisFilePath = path.join(__dirname, 'public', 'analysis.txt');
+
+        fs.readFile(analysisFilePath, 'utf8', (err, analysisSummary) => {
+          if (err) {
+            console.error('Error reading analysis.txt:', err);
+            return res.status(500).json({ error: 'Failed to retrieve analysis summary' });
+          }
+
+          res.json({
+            analysis_summary: analysisSummary.trim(), // Send only the file contents, not stdout
+            graph_url: graphImageUrl,
+          });
+        });
       });
     });
 

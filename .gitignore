@@ -11,3 +11,5 @@ __pycache__/
 src/*.csv
 *.pkl
 *.log
+public/*.png
+public/*.txt

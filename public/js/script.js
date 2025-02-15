@@ -56,6 +56,7 @@ async function analyzeSentiment() {
     const url = document.getElementById('urlInput').value.trim();
     const resultElement = document.getElementById('result');
     const feedbackElement = document.getElementById('analysisText');
+    const graphImage = document.getElementById('sentimentGraph');  // Reference to graph image
 
     if (!url) {
         alert('Please enter a URL.');
@@ -82,13 +83,16 @@ async function analyzeSentiment() {
         feedbackElement.innerHTML = `<strong>Analysis & Feedback:</strong> <br>${analysisResults.analysis_summary}`;
         resultElement.innerText = 'Analysis Complete!';
         resultElement.classList.remove('loading');
+
+        // ✅ Ensure the correct graph URL is set
+        graphImage.src = `/sentiment_distribution.png`;  // No "public/" in path
+        graphImage.style.display = 'block';  // Ensure it's visible
     } catch (error) {
         console.error('Error:', error);
         resultElement.innerText = `Error occurred: ${error.message}`;
         resultElement.className = 'error';
     }
 }
-
 
 // Function to dynamically update sentiment styling
 function updateSentimentClass(element, sentiment) {
