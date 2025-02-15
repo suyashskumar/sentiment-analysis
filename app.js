@@ -135,7 +135,7 @@ app.post('/analyze', async (req, res) => {
       console.log('Scraping complete, starting sentiment analysis...');
 
       // Step 2: Run sentiment analysis (which also generates the graph)
-      const analyzer = spawn('python', ['src/sentiment_model2.py']);
+      const analyzer = spawn('python', ['src/sentiment_model2.py', 'batch']);
 
       let analysisResult = '';
 
